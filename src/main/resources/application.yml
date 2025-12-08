@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: today-mind-server
+
+oauth:
+  kakao:
+    user-info-url: https://kapi.kakao.com/v2/user/me
+  google:
+    user-info-url: https://openidconnect.googleapis.com/v1/userinfo
