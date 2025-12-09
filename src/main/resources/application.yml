@@ -7,3 +7,10 @@ oauth:
     user-info-url: https://kapi.kakao.com/v2/user/me
   google:
     user-info-url: https://openidconnect.googleapis.com/v1/userinfo
+
+jwt:
+  access-token:
+    expire-time: ${ACCESS_TOKEN_EXPIRE_TIME}
+  refresh-token:
+    expire-time: ${REFRESH_TOKEN_EXPIRE_TIME}
+  secret-key: ${JWT_SECRET_KEY}
