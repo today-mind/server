@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.todaymindserver.common.policy.RefreshTokenPolicy;
-import com.example.todaymindserver.common.util.JwtUtil;
+import com.example.todaymindserver.common.util.JwtProvider;
 import com.example.todaymindserver.dto.request.RefreshTokenRequestDto;
 import com.example.todaymindserver.dto.response.RefreshTokenResponseDto;
 import com.example.todaymindserver.entity.RefreshToken;
@@ -20,7 +20,7 @@ public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenPolicy refreshTokenPolicy;
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
 
     /**
      * Refresh Token을 저장하거나 기존 토큰을 새로운 값으로 교체한다.
@@ -60,7 +60,7 @@ public class RefreshTokenService {
 
         refreshTokenPolicy.validateRefreshToken(inputToken);
 
-        Long userId = jwtUtil.extractUserId(inputToken);
+        Long userId = jwtProvider.extractUserId(jwtProvider.parseClaims(inputToken));
 
         RefreshToken storedRefreshToken = refreshTokenRepository.findById(userId)
             .orElseThrow(() -> {
@@ -70,8 +70,8 @@ public class RefreshTokenService {
 
         refreshTokenPolicy.validateStoredTokenMatch(inputToken, storedRefreshToken);
 
-        String accessToken = jwtUtil.createAccessToken(userId);
-        String refreshToken = jwtUtil.createRefreshToken(userId);
+        String accessToken = jwtProvider.createAccessToken(userId);
+        String refreshToken = jwtProvider.createRefreshToken(userId);
         saveOrUpdate(userId, refreshToken);
 
         return new RefreshTokenResponseDto(

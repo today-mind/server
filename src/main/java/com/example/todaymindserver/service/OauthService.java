@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.todaymindserver.common.provider.OauthProvider;
-import com.example.todaymindserver.common.util.JwtUtil;
+import com.example.todaymindserver.common.util.JwtProvider;
 import com.example.todaymindserver.common.factory.OauthProviderFactory;
 import com.example.todaymindserver.common.util.OauthProviderType;
 import com.example.todaymindserver.dto.request.OauthRequestDto;
@@ -22,7 +22,7 @@ public class OauthService {
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
     private final OauthProviderFactory providerFactory;
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
 
     /**
      * OAuth 로그인 혹은 회원가입을 처리하는 핵심 비즈니스 흐름.
@@ -57,8 +57,8 @@ public class OauthService {
 
         User user = findOrCreateUserBy(oauthProviderType, userInfo.sub(), userInfo.email());
 
-        String accessToken = jwtUtil.createAccessToken(user.getUserId());
-        String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
+        String accessToken = jwtProvider.createAccessToken(user.getUserId());
+        String refreshToken = jwtProvider.createRefreshToken(user.getUserId());
 
         refreshTokenService.saveOrUpdate(user.getUserId(), refreshToken);
 
