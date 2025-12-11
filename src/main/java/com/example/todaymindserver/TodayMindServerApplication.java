@@ -2,10 +2,10 @@ package com.example.todaymindserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing; // <--- 1. 이 줄을 추가
 
+@EnableJpaAuditing
 @SpringBootApplication
-@EnableJpaAuditing // CreatedAt, UpdatedAt 자동 관리를 위해 유지
 public class TodayMindServerApplication {
 
     public static void main(String[] args) {
