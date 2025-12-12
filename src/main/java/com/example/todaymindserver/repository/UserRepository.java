@@ -11,4 +11,6 @@ import com.example.todaymindserver.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByProviderAndProviderUserId(OauthProviderType provider, String providerUserId);
+
+    Optional<User> findByNickName(String nickName);
 }

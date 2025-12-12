@@ -1,26 +1,33 @@
 package com.example.todaymindserver.entity;
 
+import com.example.todaymindserver.common.util.MbtiType;
 import com.example.todaymindserver.common.util.OauthProviderType;
+import com.example.todaymindserver.common.util.ToneType;
+import com.example.todaymindserver.common.util.UserStatus;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
+    @Column(unique = true)
     private String nickName;
 
     private String email;
@@ -30,6 +37,30 @@ public class User {
 
     @Column(nullable = false, unique = true)
     private String providerUserId;
+
+    // AI 페르소나 설정 (MyPage API 담당)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MbtiType mbtiType = MbtiType.T;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ToneType toneType = ToneType.HONORIFIC;
+
+    // 3. 회원 상태 (MyPage API 담당)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserStatus status = UserStatus.ACTIVE;
+
+    // 4. Auditing
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+    private String password;
 
     private User(String email, OauthProviderType provider, String providerUserId) {
         this.email = email;
@@ -43,5 +74,21 @@ public class User {
             provider,
             providerUserId
         );
+    }
+
+    // 닉네임 설정을 위한 메서드
+    public void updateNickname(String nickname) {
+        this.nickName = nickname;
+    }
+
+    // 앱 잠금 비밀번호 설정을 위한 메서드
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    // AI 설정 변경을 위한 메서드
+    public void updateAiSettings(MbtiType mbtiType, ToneType toneType) {
+        this.mbtiType = mbtiType;
+        this.toneType = toneType;
     }
 }
