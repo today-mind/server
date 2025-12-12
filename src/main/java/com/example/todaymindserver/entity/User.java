@@ -1,5 +1,10 @@
 package com.example.todaymindserver.entity;
 
+import com.example.todaymindserver.common.util.MbtiType;
+import com.example.todaymindserver.common.util.OauthProviderType;
+import com.example.todaymindserver.common.util.ToneType;
+import com.example.todaymindserver.common.util.UserStatus;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +28,18 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
+
+    @Column
+    private String nickName;
+
+    private String email;
+
+    @Enumerated(EnumType.STRING)
+    private OauthProviderType provider;
+
+    @Column(nullable = false, unique = true)
+    private String providerUserId;
 
     // 2. 프로필/설정 정보 (당신 담당: 닉네임)
     @Column
@@ -53,11 +69,23 @@ public class User {
     private LocalDateTime updatedAt;
     private String password;
 
-    // --- 비즈니스 메서드 (닉네임/마이페이지 업데이트를 위해 유지) ---
+    private User(String email, OauthProviderType provider, String providerUserId) {
+        this.email = email;
+        this.provider = provider;
+        this.providerUserId = providerUserId;
+    }
+
+    public static User create (String email, OauthProviderType provider, String providerUserId) {
+        return new User(
+            email,
+            provider,
+            providerUserId
+        );
+    }
 
     // 닉네임 설정을 위한 메서드
     public void updateNickname(String nickname) {
-        this.nickname = nickname;
+        this.nickName = nickname;
     }
 
     // 앱 잠금 비밀번호 설정을 위한 메서드

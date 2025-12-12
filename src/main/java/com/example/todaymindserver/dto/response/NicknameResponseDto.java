@@ -1,4 +1,4 @@
-package com.example.todaymindserver.dto;
+package com.example.todaymindserver.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
