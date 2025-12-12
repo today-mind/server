@@ -26,7 +26,7 @@ public class User {
     private Long id;
 
     // 2. 프로필/설정 정보 (당신 담당: 닉네임)
-    @Column(unique = true)
+    @Column
     private String nickname;
 
     // AI 페르소나 설정 (MyPage API 담당)
@@ -70,5 +70,5 @@ public class User {
         this.mbtiType = mbtiType;
         this.toneType = toneType;
     }
-    // [제거됨] UserDetails 오버라이드 메서드 6개 (getAuthorities(), getUsername(), isAccountNonExpired() 등)
+    // final change //
 }
