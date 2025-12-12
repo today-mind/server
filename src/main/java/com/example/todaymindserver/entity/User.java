@@ -10,25 +10,34 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
+
+// --- 추가된 Import ---
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails; // UserDetails 추가
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+// @Builder // create() 메서드 사용으로 인해 제거
+// implements UserDetails 추가
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column(unique = true)
-    private String nickName;
+    @Column
+    private String nickName; // Unique 제거된 상태
 
     private String email;
 
@@ -62,6 +71,7 @@ public class User {
     private LocalDateTime updatedAt;
     private String password;
 
+    // OAuth용 생성자 (김용준 님 코드)
     private User(String email, OauthProviderType provider, String providerUserId) {
         this.email = email;
         this.provider = provider;
@@ -70,9 +80,9 @@ public class User {
 
     public static User create (String email, OauthProviderType provider, String providerUserId) {
         return new User(
-            email,
-            provider,
-            providerUserId
+                email,
+                provider,
+                providerUserId
         );
     }
 
@@ -90,5 +100,38 @@ public class User {
     public void updateAiSettings(MbtiType mbtiType, ToneType toneType) {
         this.mbtiType = mbtiType;
         this.toneType = toneType;
+    }
+
+    // --- UserDetails 오버라이드 메서드 (AuthenticationPrincipal 사용 필수) ---
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // 권한 설정이 없으므로 임시로 빈 리스트 반환
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @Override
+    public String getUsername() {
+        return String.valueOf(this.userId); // 인증 주체(Principal)로 userId를 사용
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.status == UserStatus.ACTIVE;
     }
 }
