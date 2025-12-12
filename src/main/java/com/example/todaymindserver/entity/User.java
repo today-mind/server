@@ -1,23 +1,74 @@
 package com.example.todaymindserver.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+@Builder
+
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long id;
 
-    private String username;
-
-    @Column(nullable = false)
+    // 2. 프로필/설정 정보 (당신 담당: 닉네임)
+    @Column(unique = true)
     private String nickname;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    // AI 페르소나 설정 (MyPage API 담당)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MbtiType mbtiType = MbtiType.T;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ToneType toneType = ToneType.HONORIFIC;
+
+    // 3. 회원 상태 (MyPage API 담당)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserStatus status = UserStatus.ACTIVE;
+
+    // 4. Auditing
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+    private String password;
+
+    // --- 비즈니스 메서드 (닉네임/마이페이지 업데이트를 위해 유지) ---
+
+    // 닉네임 설정을 위한 메서드
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    // 앱 잠금 비밀번호 설정을 위한 메서드
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    // AI 설정 변경을 위한 메서드
+    public void updateAiSettings(MbtiType mbtiType, ToneType toneType) {
+        this.mbtiType = mbtiType;
+        this.toneType = toneType;
+    }
+    // [제거됨] UserDetails 오버라이드 메서드 6개 (getAuthorities(), getUsername(), isAccountNonExpired() 등)
 }
