@@ -41,10 +41,6 @@ public class User {
     @Column(nullable = false, unique = true)
     private String providerUserId;
 
-    // 2. 프로필/설정 정보 (당신 담당: 닉네임)
-    @Column
-    private String nickname;
-
     // AI 페르소나 설정 (MyPage API 담당)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
