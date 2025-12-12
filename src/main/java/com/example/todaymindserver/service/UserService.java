@@ -1,14 +1,13 @@
 package com.example.todaymindserver.service;
 
 import com.example.todaymindserver.common.response.dto.ProfileResponseDto;
-import com.example.todaymindserver.dto.NicknameRequestDto;
-import com.example.todaymindserver.dto.NicknameResponseDto;
+import com.example.todaymindserver.dto.request.NicknameRequestDto;
+import com.example.todaymindserver.dto.response.NicknameResponseDto;
 import com.example.todaymindserver.entity.User;
 import com.example.todaymindserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Optional; // UserRepository 사용을 위해 Optional import
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +18,7 @@ public class UserService {
 
     // 헬퍼 메서드: 닉네임 중복 체크
     private void checkNicknameDuplication(String nickname) {
-        if (userRepository.findByNickname(nickname).isPresent()) {
+        if (userRepository.findByNickName(nickname).isPresent()) {
             throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
         }
     }
@@ -39,11 +38,11 @@ public class UserService {
 
         // 엔티티 대신 DTO 반환
         return NicknameResponseDto.builder()
-                .nickname(user.getNickname())
+                .nickname(user.getNickName())
                 .build();
     }
 
-    /** 2. 마이페이지 프로필 정보 조회 (GET /api/mypage/profile) */
+    /** 2. 마이페이지 프로필 정보 조회 (GET /api/my-page/profile) */
     @Transactional(readOnly = true)
     public ProfileResponseDto getProfile(Long userId) { // 반환 타입을 User -> ProfileResponseDto로 변경
         User user = userRepository.findById(userId)
@@ -51,12 +50,12 @@ public class UserService {
 
         // 엔티티(User)를 응답 DTO로 변환하여 반환
         return ProfileResponseDto.builder()
-                .nickname(user.getNickname())
+                .nickname(user.getNickName())
                 .mbtiType(user.getMbtiType())
                 .toneType(user.getToneType())
                 .build();
     }
 
-    /** 3. AI 설정 변경 */
+    /* 3. AI 설정 변경 */
     // 이 외에 updatePassword, updateAiSettings 등 나머지 MyPage 로직이 여기에 추가될 수 있습니다.
 }

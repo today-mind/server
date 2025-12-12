@@ -1,7 +1,7 @@
 package com.example.todaymindserver.common.response.dto;
 
-import com.example.todaymindserver.entity.MbtiType;
-import com.example.todaymindserver.entity.ToneType;
+import com.example.todaymindserver.common.util.MbtiType;
+import com.example.todaymindserver.common.util.ToneType;
 import lombok.Builder;
 import lombok.Getter;
 

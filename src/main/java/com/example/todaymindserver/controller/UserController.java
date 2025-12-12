@@ -1,8 +1,8 @@
 package com.example.todaymindserver.controller;
 
 import com.example.todaymindserver.common.response.ApiResponse;
-import com.example.todaymindserver.dto.NicknameRequestDto;
-import com.example.todaymindserver.dto.NicknameResponseDto;
+import com.example.todaymindserver.dto.request.NicknameRequestDto;
+import com.example.todaymindserver.dto.response.NicknameResponseDto;
 import com.example.todaymindserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +29,7 @@ public class UserController {
     }
 
     // 2. 마이페이지 프로필 정보 조회
-    @GetMapping("/mypage/profile")
+    @GetMapping("/users/me/profile")
     public ApiResponse<ProfileResponseDto> getProfile(
             // @AuthenticationPrincipal Long userId <----- 이 줄도 임시로 주석 처리하거나 삭제합니다.
     ) {
