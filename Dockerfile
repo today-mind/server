@@ -19,9 +19,6 @@ ENTRYPOINT [
     "-XX:+UseG1GC",
     "-Duser.timezone=Asia/Seoul",
     "-XX:+ExitOnOutOfMemoryError",
-    "-Xlog:gc*,gc+heap=info",
-    "-XX:+HeapDumpOnOutOfMemoryError",
-    "-XX:HeapDumpPath=/app/heapdump.hprof",
     "-jar",
     "app.jar"
 ]
