@@ -28,8 +28,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-// @Builder // create() 메서드 사용으로 인해 제거
-// implements UserDetails 추가
 public class User implements UserDetails {
 
     @Id
