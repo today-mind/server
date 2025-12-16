@@ -1,6 +1,7 @@
 package com.example.todaymindserver.service;
 
 import com.example.todaymindserver.dto.request.DiaryRequestDto;
+import com.example.todaymindserver.dto.response.DiaryResponseDto; // Import 변경
 import com.example.todaymindserver.entity.Diary;
 import com.example.todaymindserver.entity.User;
 import com.example.todaymindserver.repository.DiaryRepository;
@@ -20,6 +21,7 @@ public class DiaryService {
 
     private final DiaryRepository diaryRepository;
     private final UserRepository userRepository;
+    // private final AiService aiService; // <--- AiService 의존성 제거 (리뷰 미반영)
 
     /**
      * 일기 작성 처리 및 AI 답장 생성 트리거
@@ -27,10 +29,10 @@ public class DiaryService {
      *
      * @param userId 인증된 사용자 ID
      * @param request 일기 작성 요청 DTO
-     * @return 저장된 일기의 고유 ID (diaryId)
+     * @return 저장된 일기의 고유 ID DTO
      */
     @Transactional
-    public Long createDiary(Long userId, DiaryRequestDto request) {
+    public DiaryResponseDto createDiary(Long userId, DiaryRequestDto request) { // <--- 반환 타입 변경
 
         // 1. User 엔티티 조회
         User user = userRepository.findById(userId)
@@ -44,11 +46,14 @@ public class DiaryService {
         );
         diaryRepository.save(diary);
 
-        // 3. [TODO] AI 엔진으로 일기 내용 전송 (비동기 트리거)
+        // 3. [TODO] AI 엔진으로 일기 내용 전송 (비동기 트리거) - 주석 처리 유지
         // why: 1번 기능 명세에 따라, 최종 저장 시 일기 내용은 AI 엔진으로 전송되어 답장을 생성해야 합니다.
-        // triggerAiResponseGeneration(diary);
+        // aiService.triggerAiResponseGeneration(diary); // <--- AI Service 호출 제거
         log.info("일기 작성 완료 및 AI 트리거 대기: DiaryId={}", diary.getDiaryId());
 
-        return diary.getDiaryId();
+        // 4. Response DTO 반환
+        return DiaryResponseDto.builder()
+                .diaryId(diary.getDiaryId())
+                .build();
     }
 }
