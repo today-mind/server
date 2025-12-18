@@ -82,14 +82,18 @@ public class DiaryService {
         LocalDateTime startOfMonth = startDate.atStartOfDay();
         LocalDateTime endOfMonth = endDate.atTime(23, 59, 59);
 
-        // 2. DB에서 해당 월의 일기 목록 조회 (특정 사용자의 일기만)
-        List<Diary> diaries = diaryRepository.findByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(
-                userId,
+        // 2. User 엔티티 조회
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. (ID: " + userId + ")"));
+
+        // 3. DB에서 해당 월의 일기 목록 조회 (특정 사용자의 일기만)
+        List<Diary> diaries = diaryRepository.findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(
+                user,
                 startOfMonth,
                 endOfMonth
         );
 
-        // 3. DTO로 변환
+        // 4. DTO로 변환
         List<DiaryCalendarResponseDto.DiaryCalendarItem> items = diaries.stream()
                 .map(DiaryCalendarResponseDto.DiaryCalendarItem::from)
                 .collect(Collectors.toList());
