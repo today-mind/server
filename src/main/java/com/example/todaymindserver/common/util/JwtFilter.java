@@ -1,5 +1,7 @@
 package com.example.todaymindserver.common.util;
 
+import java.io.IOException;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -7,6 +9,7 @@ import com.example.todaymindserver.service.JwtAuthenticationService;
 
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +27,7 @@ public class JwtFilter extends OncePerRequestFilter {
         @Nonnull HttpServletRequest request,
         @Nonnull HttpServletResponse response,
         @Nonnull FilterChain chain
-    ) {
+    ) throws ServletException, IOException {
 
         try {
             String token = resolveToken(request);
@@ -44,7 +47,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 request.getRequestURI(),
                 e.getMessage()
             );
+            SecurityContextHolder.clearContext();
         }
+        chain.doFilter(request, response);
     }
 
     private String resolveToken(HttpServletRequest request) {
