@@ -39,8 +39,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 );
             }
 
-            chain.doFilter(request, response);
-
         } catch (Exception e) {
             log.warn("JWT 검증 실패: method={}, uri={}, message={}",
                 request.getMethod(),
