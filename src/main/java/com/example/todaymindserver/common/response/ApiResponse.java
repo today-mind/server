@@ -18,7 +18,6 @@ public class ApiResponse<T> {
         this.data = data;
     }
 
-    // 성공 응답 (기존과 동일)
     public static <T> ApiResponse<T> success(String message, T data, HttpStatus status) {
         return ApiResponse.<T>builder()
                 .status(status)
@@ -31,11 +30,11 @@ public class ApiResponse<T> {
         return success(message, data, HttpStatus.OK);
     }
 
-    // [수정] 에러 응답 - 이제 null이 아니라 제대로 된 객체를 반환
-    public static ApiResponse<Void> error(String code, String message) {
+    //
+    public static ApiResponse<Void> error(String message, HttpStatus status) {
         return ApiResponse.<Void>builder()
-                .status(HttpStatus.BAD_REQUEST)
-                .message("[" + code + "] " + message)
+                .status(status)
+                .message(message)
                 .data(null)
                 .build();
     }
