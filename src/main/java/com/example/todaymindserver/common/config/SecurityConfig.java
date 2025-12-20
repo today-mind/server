@@ -48,14 +48,15 @@ public class SecurityConfig {
                 .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers(HttpMethod.POST,
-                                "/oauth/**",
-                                "/auth/token/refresh"
-                        ).permitAll()
-                        .requestMatchers("/api/users/lock-setting/**").permitAll()
-                        .requestMatchers("/api/users/diaries/**").permitAll()
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers(HttpMethod.POST,
+                    "/oauth/**",
+                    "/auth/token/refresh"
+                ).permitAll()
+                .requestMatchers("/api/users/lock-setting/**").permitAll()
+                .requestMatchers("/api/users/diaries/**").permitAll()
+                .requestMatchers("/api/**").authenticated()
 
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().denyAll()
