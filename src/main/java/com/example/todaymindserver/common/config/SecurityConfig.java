@@ -48,22 +48,20 @@ public class SecurityConfig {
                 .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/actuator/health").permitAll()
-                .requestMatchers(HttpMethod.POST,
-                    "/oauth/**",
-                    "/auth/token/refresh"
-                ).permitAll()
-                .requestMatchers("/api/users/lock-setting/**").permitAll()
-                .requestMatchers("/api/users/diaries/**").permitAll()
-                .requestMatchers("/api/**").authenticated()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/oauth/**",
+                                "/auth/token/refresh"
+                        ).permitAll()
+                        .requestMatchers("/api/users/lock-setting/**").permitAll()
+                        .requestMatchers("/api/users/diaries/**").permitAll()
+                        .requestMatchers("/api/**").authenticated()
 
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().denyAll()
                 )
-
                 .addFilterBefore(new JwtFilter(jwtAuthenticationService, jwtUtil), UsernamePasswordAuthenticationFilter.class)
-
                 .exceptionHandling(configurer ->
                         configurer
                                 .authenticationEntryPoint(authenticationEntryPoint)
