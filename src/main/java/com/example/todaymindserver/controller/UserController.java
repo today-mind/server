@@ -26,7 +26,6 @@ public class UserController {
             @AuthenticationPrincipal Long userId,
             @RequestBody @Valid NicknameRequestDto request) {
 
-        // targetId(1L) 로직 제거! userId가 null이면 서비스에서 예외 처리하도록 위임
         NicknameResponseDto response = userService.setupNickname(userId, request);
         return ApiResponse.success("닉네임 설정 완료", response);
     }
