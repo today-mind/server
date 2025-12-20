@@ -13,12 +13,4 @@ COPY --chown=spring:spring build/libs/today-mind.jar app.jar
 USER spring
 
 # 컨테이너 시작 시 실행될 명령
-ENTRYPOINT [
-    "java",
-    "-XX:MaxRAMPercentage=70.0",
-    "-XX:+UseG1GC",
-    "-Duser.timezone=Asia/Seoul",
-    "-XX:+ExitOnOutOfMemoryError",
-    "-jar",
-    "app.jar"
-]
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=70.0", "-XX:+UseG1GC", "-Duser.timezone=Asia/Seoul", "-XX:+ExitOnOutOfMemoryError", "-jar", "app.jar"]
