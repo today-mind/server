@@ -36,7 +36,7 @@ public class User implements UserDetails {
     private Long userId;
 
     @Column
-    private String nickname; // Unique 제거된 상태
+    private String nickName; // Unique 제거된 상태
 
     private String email;
 
@@ -87,7 +87,7 @@ public class User implements UserDetails {
 
     // 닉네임 설정을 위한 메서드
     public void updateNickname(String nickname) {
-        this.nickname = nickname;
+        this.nickName = nickname;
     }
 
     // 앱 잠금 비밀번호 설정을 위한 메서드

@@ -13,9 +13,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     protected ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException e) {
         ErrorCode errorCode = e.getErrorCode();
+        log.error("BusinessException: {}", errorCode.getMessage());
         return ResponseEntity
                 .status(errorCode.getStatus())
-                .body(ApiResponse.error(errorCode.getMessage(), errorCode.getStatus()));
+                .body(ApiResponse.error(errorCode.getCode(), errorCode.getMessage(), errorCode.getStatus()));
     }
 
     @ExceptionHandler(Exception.class)
@@ -23,6 +24,6 @@ public class GlobalExceptionHandler {
         log.error("Unhandled Exception: ", e);
         return ResponseEntity
                 .status(500)
-                .body(ApiResponse.error("서버 내부 오류가 발생했습니다.", org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR));
+                .body(ApiResponse.error("COMMON_ERROR", "서버 내부 오류가 발생했습니다.", org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR));
     }
 }
