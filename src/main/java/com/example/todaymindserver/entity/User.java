@@ -5,6 +5,7 @@ import com.example.todaymindserver.common.util.OauthProviderType;
 import com.example.todaymindserver.common.util.ToneType;
 import com.example.todaymindserver.common.util.UserStatus;
 
+import io.micrometer.common.KeyValues;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -131,5 +132,9 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return this.status == UserStatus.ACTIVE;
+    }
+
+    public KeyValues getDiaries() {
+        return null;
     }
 }

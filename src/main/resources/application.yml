@@ -11,7 +11,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
 
 oauth:
   kakao:
@@ -25,3 +25,9 @@ jwt:
   refresh-token:
     expire-time: ${REFRESH_TOKEN_EXPIRE_TIME}
   secret-key: ${JWT_SECRET_KEY}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
