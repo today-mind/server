@@ -53,8 +53,9 @@ public class SecurityConfig {
                     "/oauth/**/login",
                     "/auth/token/refresh"
                 ).permitAll()
-                .requestMatchers("/api/**").authenticated()
+                    .requestMatchers("/api/diaries/**").permitAll()
 
+                .requestMatchers("/api/**").authenticated()
                 .anyRequest().denyAll()
             )
 

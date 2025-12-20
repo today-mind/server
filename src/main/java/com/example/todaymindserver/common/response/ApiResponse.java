@@ -41,4 +41,8 @@ public class ApiResponse<T> {
                 .data(null)
                 .build();
     }
+
+    public static ApiResponse<Void> error(String code, String message) {
+        return null;
+    }
 }

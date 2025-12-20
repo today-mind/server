@@ -1,6 +1,9 @@
 spring:
+  profiles:
+    active: local
   application:
     name: today-mind-server
+
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
