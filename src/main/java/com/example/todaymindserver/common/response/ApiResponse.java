@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 public class ApiResponse<T> {
 
     private final int status;
-    private final String code; // 추가
+    private final String code;
     private final String message;
     private final T data;
 
@@ -20,15 +20,29 @@ public class ApiResponse<T> {
         this.data = data;
     }
 
-    public static <T> ApiResponse<T> success(String message, T data) {
+    /**
+     * [추가] 성공 응답 (메시지, 데이터, 커스텀 상태 코드)
+     * DiaryController에서 HttpStatus.CREATED를 보낼 수 있게 해줍니다.
+     */
+    public static <T> ApiResponse<T> success(String message, T data, HttpStatus status) {
         return ApiResponse.<T>builder()
-                .status(HttpStatus.OK)
-                .code("SUCCESS")
+                .status(status)
+                .code("SUCCESS") // 성공 시 기본 코드
                 .message(message)
                 .data(data)
                 .build();
     }
 
+    /**
+     * 성공 응답 (기본 200 OK)
+     */
+    public static <T> ApiResponse<T> success(String message, T data) {
+        return success(message, data, HttpStatus.OK);
+    }
+
+    /**
+     * 에러 응답
+     */
     public static ApiResponse<Void> error(String code, String message, HttpStatus status) {
         return ApiResponse.<Void>builder()
                 .status(status)
