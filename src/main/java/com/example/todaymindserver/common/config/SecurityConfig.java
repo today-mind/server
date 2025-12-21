@@ -56,10 +56,11 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/api/users/lock-setting/**").permitAll()
                         .requestMatchers("/api/users/diaries/**").permitAll()
-                        .requestMatchers("/api/**").authenticated()
+                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/api/users/ai-setting/**").permitAll()
 
                         .requestMatchers("/api/**").authenticated()
-                        .anyRequest().denyAll()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(new JwtFilter(jwtAuthenticationService, jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(configurer ->

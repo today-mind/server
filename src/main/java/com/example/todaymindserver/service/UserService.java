@@ -1,10 +1,14 @@
 package com.example.todaymindserver.service;
 
+import com.example.todaymindserver.common.exception.BusinessException;
+import com.example.todaymindserver.common.exception.ErrorCode;
 import com.example.todaymindserver.common.response.dto.ProfileResponseDto;
+import com.example.todaymindserver.common.util.ToneType;
 import com.example.todaymindserver.dto.request.NicknameRequestDto;
 import com.example.todaymindserver.dto.response.NicknameResponseDto;
 import com.example.todaymindserver.entity.User;
 import com.example.todaymindserver.repository.UserRepository;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,6 +60,20 @@ public class UserService {
                 .build();
     }
 
-    /* 3. AI 설정 변경 */
-    // 이 외에 updatePassword, updateAiSettings 등 나머지 MyPage 로직이 여기에 추가될 수 있습니다.
+    /**
+     * [기능 5] AI 답장 톤앤매너 설정 업데이트
+     * <p>why: 사용자가 선택한 말투(String)를 Enum으로 변환하여 안전하게 DB에 반영합니다.</p>
+     * * @param userId 인증된 사용자 ID
+     * @param toneTypeStr 요청받은 말투 문자열 (예: "FRIENDLY", "CASUAL")
+     */
+    @Transactional
+    public void updateAiTone(Long userId, String toneTypeStr) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        // DTO에서 넘어온 String이 Enum에 없는 값이라면,
+        // 컨트롤러 진입 전 HttpMessageNotReadableException에서 이미 걸러집니다.
+        ToneType toneType = ToneType.valueOf(toneTypeStr);
+        user.updateAiSettings(user.getMbtiType(), toneType);
+    }
 }
