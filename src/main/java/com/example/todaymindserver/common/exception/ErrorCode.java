@@ -24,6 +24,6 @@ public enum ErrorCode {
     APP_LOCK_NOT_SET(HttpStatus.NOT_FOUND, "L002", "설정된 잠금 비밀번호가 없습니다.");
 
     private final HttpStatus status;
-    private final String code;  // 기찬님이 강조하신 비즈니스 에러 코드
+    private final String code;  
     private final String message;
 }
