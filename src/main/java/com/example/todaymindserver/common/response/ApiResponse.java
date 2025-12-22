@@ -51,4 +51,12 @@ public class ApiResponse<T> {
                 .data(null)
                 .build();
     }
+
+    public static ApiResponse<Void> error(int i, String commonError, String s) {
+        return null;
+    }
+
+    public static Object error(HttpStatus status, String code, String message) {
+        return null;
+    }
 }

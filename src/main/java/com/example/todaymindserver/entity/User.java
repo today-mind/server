@@ -49,7 +49,7 @@ public class User implements UserDetails {
     // AI 페르소나 설정 (MyPage API 담당)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private MbtiType mbtiType = MbtiType.T;
+    private MbtiType mbtiType = MbtiType.NONE;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
