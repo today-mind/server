@@ -1,29 +1,28 @@
 package com.example.todaymindserver.common.exception;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 /**
- * 전역 에러 코드 정의 (Business Error Code 포함)
- * 유지보수와 가독성을 위해 고유 코드를 관리합니다.
+ * 프로젝트 전역에서 사용하는 에러 코드 정의
  */
 @Getter
-@RequiredArgsConstructor
 public enum ErrorCode {
+    // 공통 에러
+    INTERNAL_SERVER_ERROR(500, "COMMON_ERROR", "서버 내부 오류가 발생했습니다."),
 
-    // Common
-    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "C001", "입력값이 올바르지 않습니다."),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "C002", "서버 내부 오류가 발생했습니다."),
+    // 유저 관련 에러 (U)
+    USER_NOT_FOUND(404, "U001", "사용자를 찾을 수 없습니다."),
+    APP_LOCK_NOT_SET(400, "U002", "잠금 설정이 되어 있지 않습니다."),
+    INVALID_APP_PASSWORD(400, "U003", "비밀번호가 일치하지 않습니다."),
+    NICKNAME_DUPLICATED(400, "U004", "이미 사용 중인 닉네임입니다.");
 
-    // User
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "사용자를 찾을 수 없습니다."),
-
-    // App Lock (4번 기능)
-    INVALID_APP_PASSWORD(HttpStatus.BAD_REQUEST, "L001", "잠금 비밀번호가 일치하지 않습니다."),
-    APP_LOCK_NOT_SET(HttpStatus.NOT_FOUND, "L002", "설정된 잠금 비밀번호가 없습니다.");
-
-    private final HttpStatus status;
-    private final String code;  // 기찬님이 강조하신 비즈니스 에러 코드
+    private final int status;
+    private final String code;
     private final String message;
+
+    ErrorCode(int status, String code, String message) {
+        this.status = status;
+        this.code = code;
+        this.message = message;
+    }
 }

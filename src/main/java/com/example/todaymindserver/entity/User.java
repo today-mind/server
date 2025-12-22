@@ -48,11 +48,11 @@ public class User implements UserDetails {
 
     // AI 페르소나 설정 (MyPage API 담당)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
-    private MbtiType mbtiType = MbtiType.T;
+    @Column(nullable = false)
+    private MbtiType mbtiType = MbtiType.NONE;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     private ToneType toneType = ToneType.HONORIFIC;
 
     // 3. 회원 상태 (MyPage API 담당)

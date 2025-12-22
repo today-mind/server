@@ -36,4 +36,12 @@ public class ApiResponse<T> {
     public static ApiResponse<Void> error(int status, String message) {
         return new ApiResponse<>(status, message, null);
     }
+
+    public static ApiResponse<Void> error(int i, String commonError, String s) {
+        return null;
+    }
+
+    public static Object error(HttpStatus status, String code, String message) {
+        return null;
+    }
 }
