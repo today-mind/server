@@ -17,6 +17,7 @@ import com.example.todaymindserver.common.util.CustomAccessDeniedHandler;
 import com.example.todaymindserver.common.util.CustomAuthenticationEntryPoint;
 import com.example.todaymindserver.common.util.JwtFilter;
 import com.example.todaymindserver.common.util.JwtUtil;
+import com.example.todaymindserver.common.util.Role;
 import com.example.todaymindserver.service.JwtAuthenticationService;
 
 import lombok.RequiredArgsConstructor;
@@ -54,6 +55,8 @@ public class SecurityConfig {
                     "/oauth/**",
                     "/auth/token/refresh"
                 ).permitAll()
+                .requestMatchers("/api/diaries/**").hasRole(Role.USER.name())
+                .requestMatchers("/api/users/**").hasRole(Role.USER.name())
                 .requestMatchers("/api/**").authenticated()
 
                 .anyRequest().denyAll()
