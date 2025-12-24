@@ -1,7 +1,9 @@
-package com.example.todaymindserver.entity;
+package com.example.todaymindserver.domain.diary;
 
-import com.example.todaymindserver.common.util.EmotionType;
-import com.example.todaymindserver.common.util.ResponseStatusType;
+import com.example.todaymindserver.domain.user.EmotionType;
+import com.example.todaymindserver.domain.user.ResponseStatusType;
+import com.example.todaymindserver.domain.BaseTime;
+import com.example.todaymindserver.domain.user.User;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

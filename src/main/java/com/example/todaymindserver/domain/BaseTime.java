@@ -1,4 +1,4 @@
-package com.example.todaymindserver.entity;
+package com.example.todaymindserver.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

@@ -1,4 +1,4 @@
-package com.example.todaymindserver.common.util;
+package com.example.todaymindserver.domain.user;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

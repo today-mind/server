@@ -1,4 +1,4 @@
-package com.example.todaymindserver.common.util;
+package com.example.todaymindserver.domain.oauth;
 
 import lombok.extern.slf4j.Slf4j;
 

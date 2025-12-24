@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 
 import com.example.todaymindserver.common.util.JwtProvider;
-import com.example.todaymindserver.entity.RefreshToken;
+import com.example.todaymindserver.domain.BusinessException;
+import com.example.todaymindserver.domain.token.RefreshToken;
+import com.example.todaymindserver.domain.token.TokenErrorCode;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ public class RefreshTokenPolicy {
         String tokenType = jwtProvider.extractTokenType(claims);
         if (!jwtProvider.getRefreshTokenTypeValue().equals(tokenType)) {
             log.error("Token Type이 Refresh가 아닙니다. type={}", tokenType);
-            throw new IllegalArgumentException("유효한 Refresh Token이 아닙니다.");
+            throw new BusinessException(TokenErrorCode.INVALID_REFRESH_TOKEN);
         }
     }
 
@@ -39,7 +41,7 @@ public class RefreshTokenPolicy {
         LocalDateTime expiration = jwtProvider.extractExpiration(claims);
         if (expiration.isBefore(LocalDateTime.now())) {
             log.error("만료된 Refresh Token입니다. exp={}", expiration);
-            throw new IllegalArgumentException("유효한 Refresh Token이 아닙니다.");
+            throw new BusinessException(TokenErrorCode.INVALID_REFRESH_TOKEN);
         }
     }
 
@@ -49,7 +51,7 @@ public class RefreshTokenPolicy {
     public void validateStoredTokenMatch(String inputToken, RefreshToken stored) {
         if (!inputToken.equals(stored.getToken())) {
             log.error("Refresh Token 불일치: 요청={}, 저장된={}", inputToken, stored.getToken());
-            throw new IllegalArgumentException("유효한 Refresh Token이 아닙니다.");
+            throw new BusinessException(TokenErrorCode.INVALID_REFRESH_TOKEN);
         }
     }
 }
