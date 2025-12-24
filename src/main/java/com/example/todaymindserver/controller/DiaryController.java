@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.*;
 import java.time.YearMonth;
 
 /**
- * 일기(Diary) 관련 API Controller
+ * 일기(Diary) 관련 API 컨트롤러
+ * [리뷰 반영]
+ * 1. @AuthenticationPrincipal Object -> Long userId로 변경 (팀 표준 준수)
+ * 2. 불필요한 타입 체크 및 헬퍼 메서드(getSafeUserId) 삭제
  */
 @Slf4j
 @RestController
@@ -28,56 +31,41 @@ public class DiaryController {
     private final DiaryService diaryService;
 
     /**
-     * 인증 정보(Principal)에서 안전하게 UserId를 추출하는 헬퍼 메서드
-     * 인증되지 않은 경우(Swagger 등) 테스트를 위해 1L을 반환합니다.
+     * 일기 작성 API
      */
-    private Long getSafeUserId(Object principal) {
-        if (principal instanceof Long) {
-            return (Long) principal;
-        }
-        if (principal instanceof String && !principal.equals("anonymousUser")) {
-            try {
-                return Long.parseLong((String) principal);
-            } catch (NumberFormatException e) {
-                log.warn("Principal 파싱 실패: {}", principal);
-            }
-        }
-        // 로그인하지 않은 경우 기본값 1L 사용 (500 에러 방지)
-        log.info("인증 정보가 없어 기본 ID 1L로 진행합니다. (Principal: {})", principal);
-        return 1L;
-    }
-
-    // 1. 일기 작성 API
     @PostMapping("/diaries")
     public ApiResponse<DiaryResponseDto> createDiary(
-            @AuthenticationPrincipal Object principal,
+            @AuthenticationPrincipal Long userId,
             @RequestBody @Valid DiaryRequestDto request) {
 
-        Long userId = getSafeUserId(principal);
+        log.info("일기 작성 요청 - 유저 ID: {}", userId);
         DiaryResponseDto response = diaryService.createDiary(userId, request);
         return ApiResponse.success("일기 작성이 완료되었습니다.", response, HttpStatus.CREATED);
     }
 
-    // 3. 일기 월별 캘린더 모아보기 API
+    /**
+     * 일기 월별 캘린더 모아보기 API
+     */
     @GetMapping("/diaries/calendar")
     public ApiResponse<DiaryCalendarResponseDto> getCalendarDiaries(
-            @AuthenticationPrincipal Object principal,
+            @AuthenticationPrincipal Long userId,
             @RequestParam("yearMonth") @DateTimeFormat(pattern = "yyyyMM") YearMonth yearMonth) {
 
-        Long userId = getSafeUserId(principal);
-        log.info("캘린더 조회 요청 - 유저: {}, 날짜: {}", userId, yearMonth);
+        log.info("캘린더 조회 요청 - 유저 ID: {}, 날짜: {}", userId, yearMonth);
 
         DiaryCalendarResponseDto response = diaryService.getCalendarDiaries(userId, yearMonth);
         return ApiResponse.success("캘린더 일기 목록 조회가 완료되었습니다.", response);
     }
 
-    // 3. 특정 일기 상세 조회 API
+    /**
+     * 특정 일기 상세 조회 API
+     */
     @GetMapping("/diaries/{diaryId}")
     public ApiResponse<DiaryDetailResponseDto> getDiaryDetail(
-            @AuthenticationPrincipal Object principal,
+            @AuthenticationPrincipal Long userId,
             @PathVariable("diaryId") Long diaryId) {
 
-        Long userId = getSafeUserId(principal);
+        log.info("일기 상세 조회 요청 - 유저 ID: {}, 일기 ID: {}", userId, diaryId);
         DiaryDetailResponseDto response = diaryService.getDiaryDetail(userId, diaryId);
         return ApiResponse.success("일기 상세 조회가 완료되었습니다.", response);
     }
