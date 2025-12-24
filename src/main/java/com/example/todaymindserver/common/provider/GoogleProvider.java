@@ -38,10 +38,12 @@ public class GoogleProvider implements OauthProvider {
 
         String sub = googleUserInfo.sub();
         String email = googleUserInfo.email();
+        String name = googleUserInfo.name();
 
         return new OauthUserInfo(
-            sub,
-            email
+                sub,
+                email,
+                name
         );
     }
 }

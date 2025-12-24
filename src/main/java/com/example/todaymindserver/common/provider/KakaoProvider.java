@@ -23,14 +23,6 @@ public class KakaoProvider implements OauthProvider {
         return OauthProviderType.KAKAO;
     }
 
-    /**
-     * <p><b>Kakao 응답 규칙</b></p>
-     * <ul>
-     * <li>'sub' : Kakao 내부에서 유일한 사용자 식별자 (Provider 단위 Unique)</li>
-     * <li>'email' : null일 수도 아닐 수도 있음 (식별자가 아닌 속성 값)</li>
-     * </ul>
-     * </p>
-     */
     @Override
     public OauthUserInfo getUserInfoFromOauthServer(OauthRequestDto request) {
 
@@ -39,9 +31,16 @@ public class KakaoProvider implements OauthProvider {
         String sub = kakaoUserInfo.id().toString();
         String email = kakaoUserInfo.kakaoAccount().email();
 
+        // [수정] 빨간 줄 해결: KakaoUserResponse의 계층 구조에 맞춰 nickname을 가져옵니다.
+        String nickname = (kakaoUserInfo.kakaoAccount() != null && kakaoUserInfo.kakaoAccount().profile() != null)
+                ? kakaoUserInfo.kakaoAccount().profile().nickname()
+                : null;
+
+        // [최종] OauthUserInfo 생성자 인자 3개(sub, email, nickname)를 맞춥니다.
         return new OauthUserInfo(
-            sub,
-            email
+                sub,
+                email,
+                nickname
         );
     }
 }
