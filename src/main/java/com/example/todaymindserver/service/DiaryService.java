@@ -1,5 +1,6 @@
 package com.example.todaymindserver.service;
 
+import com.example.todaymindserver.common.event.dto.EmpatheticResponseEvent;
 import com.example.todaymindserver.dto.request.DiaryRequestDto;
 import com.example.todaymindserver.dto.response.DiaryCalendarResponseDto; // Import 추가
 import com.example.todaymindserver.dto.response.DiaryDetailResponseDto; // Import 추가
@@ -10,6 +11,8 @@ import com.example.todaymindserver.repository.DiaryRepository;
 import com.example.todaymindserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,7 @@ public class DiaryService {
 
     private final DiaryRepository diaryRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
     // private final AiService aiService; // 1번 PR 리뷰 반영 전이므로 일단 주석 처리 유지
 
     /**
@@ -55,7 +59,16 @@ public class DiaryService {
         diaryRepository.save(diary);
 
         // 3. [TODO] AI 엔진으로 일기 내용 전송 (비동기 트리거)
-        log.info("일기 작성 완료 및 AI 트리거 대기: DiaryId={}", diary.getDiaryId());
+        applicationEventPublisher.publishEvent(
+            new EmpatheticResponseEvent(
+                diary.getDiaryId(),
+                diary.getContent(),
+                diary.getEmotionType(),
+                user.getNickName(),
+                user.getMbtiType(),
+                user.getToneType()
+            )
+        );
 
         return DiaryResponseDto.builder()
                 .diaryId(diary.getDiaryId())
@@ -123,11 +136,7 @@ public class DiaryService {
             throw new IllegalArgumentException("해당 일기에 접근할 권한이 없습니다.");
         }
 
-
-        // 2. [TODO] AI 답변 조회 (현재는 AI 답변 엔티티가 없으므로 더미 데이터 사용)
-        String aiReply = "AI 답변 준비 중입니다."; // 현재는 더미 데이터
-
         // 3. DTO 반환
-        return DiaryDetailResponseDto.from(foundDiary, aiReply);
+        return DiaryDetailResponseDto.from(foundDiary);
     }
 }
