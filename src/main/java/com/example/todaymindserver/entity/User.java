@@ -5,31 +5,25 @@ import com.example.todaymindserver.common.util.OauthProviderType;
 import com.example.todaymindserver.common.util.ToneType;
 import com.example.todaymindserver.common.util.UserStatus;
 
-import io.micrometer.common.KeyValues;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
-import lombok.Builder;
+import lombok.*;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
 /**
- * 사용자 엔티티 클래스
- * [수정 사항]
- * 1. MbtiType.NONE 참조 제거 (빌드 에러 해결 및 정책 준수)
- * 2. MBTI 미설정 시 null로 관리하도록 기본값 제거
- * 3. UserDetails 구현 유지 및 필드 정리
+ * [충돌 해결 완료] 사용자 엔티티 클래스
+ * 1. MBTI 정책 반영 (기본값 T, Null 불가)
+ * 2. UserDetails 인터페이스 구현 유지
+ * 3. 롬복 @Builder 적용 및 충돌 마커 제거
  */
 @Entity
 @Getter
@@ -37,6 +31,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "user")
 public class User implements UserDetails {
 
     @Id
@@ -107,9 +102,11 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    // AI 설정 수정 (ToneType은 null이 들어오지 않도록 방어 로직 권장)
+    // AI 설정 수정
     public void updateAiSettings(MbtiType mbtiType, ToneType toneType) {
-        this.mbtiType = mbtiType;
+        if (mbtiType != null) {
+            this.mbtiType = mbtiType;
+        }
         if (toneType != null) {
             this.toneType = toneType;
         }
