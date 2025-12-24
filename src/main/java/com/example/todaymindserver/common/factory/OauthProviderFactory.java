@@ -24,5 +24,3 @@ public class OauthProviderFactory {
         return providerMap.get(type);
     }
 }
-
-
