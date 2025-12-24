@@ -5,6 +5,9 @@ import com.example.todaymindserver.dto.request.NicknameRequestDto;
 import com.example.todaymindserver.dto.response.NicknameResponseDto;
 import com.example.todaymindserver.entity.User;
 import com.example.todaymindserver.repository.UserRepository;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +57,9 @@ public class UserService {
                 .mbtiType(user.getMbtiType())
                 .toneType(user.getToneType())
                 .build();
+    }
+
+    public void updateNickname(Long userId, @NotBlank(message = "닉네임은 필수 항목입니다.") @Size(min = 2, max = 20, message = "닉네임은 2자 이상 20자 이하로 설정해야 합니다.") @Pattern(regexp = "^[a-zA-Z0-9가-힣]*$", message = "닉네임은 특수문자를 포함할 수 없습니다.") String nickname) {
     }
 
     /* 3. AI 설정 변경 */

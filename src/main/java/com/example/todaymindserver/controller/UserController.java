@@ -1,12 +1,11 @@
 package com.example.todaymindserver.controller;
 
 import com.example.todaymindserver.common.response.ApiResponse;
-import com.example.todaymindserver.dto.request.NicknameRequestDto;
-import com.example.todaymindserver.dto.request.AppLockRequestDto;
-import com.example.todaymindserver.dto.response.NicknameResponseDto;
 import com.example.todaymindserver.common.response.dto.ProfileResponseDto;
-import com.example.todaymindserver.service.UserService;
+import com.example.todaymindserver.dto.request.AppLockRequestDto;
+import com.example.todaymindserver.dto.request.NicknameRequestDto;
 import com.example.todaymindserver.service.AppLockService;
+import com.example.todaymindserver.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +14,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 사용자 관련 모든 설정을 담당하는 컨트롤러
- * 닉네임, 프로필, 앱 잠금 기능을 포함합니다.
+ * [Branch 4 최종] 사용자 설정 및 앱 잠금 컨트롤러
+ * 리뷰어 피드백 반영: Object principal 제거 및 Long userId 직접 사용
  */
 @Slf4j
 @RestController
@@ -28,40 +27,17 @@ public class UserController {
     private final AppLockService appLockService;
 
     /**
-     * 인증 정보(Principal)에서 안전하게 UserId를 추출하는 헬퍼 메서드
-     */
-    private Long getUserIdSafely(Object principal) {
-        if (principal instanceof Long) {
-            return (Long) principal;
-        }
-        if (principal instanceof String) {
-            try {
-                return Long.parseLong((String) principal);
-            } catch (NumberFormatException e) {
-                log.error("Principal String을 Long으로 변환할 수 없습니다: {}", principal);
-            }
-        }
-
-        // 인증 정보가 없거나 타입이 맞지 않을 경우
-        // Swagger 테스트를 위해 로그를 남기고 기본값 1L 반환
-        log.warn("인증된 사용자 정보가 없습니다. 기본 ID 1L로 진행합니다. (현재 타입: {})",
-                principal != null ? principal.getClass().getSimpleName() : "null");
-        return 1L;
-    }
-
-    /**
-     * [기능 1] 닉네임 설정
+     * [기능 1] 닉네임 설정/변경
      */
     @PatchMapping("/me/nickname")
-    public ResponseEntity<ApiResponse<NicknameResponseDto>> setupNickname(
-            @AuthenticationPrincipal Object principal,
+    public ResponseEntity<ApiResponse<Void>> updateNickname(
+            @AuthenticationPrincipal Long userId,
             @RequestBody @Valid NicknameRequestDto request) {
 
-        Long targetId = getUserIdSafely(principal);
-        log.info("닉네임 변경 요청 - 유저 ID: {}, 변경할 닉네임: {}", targetId, request.getNickname());
+        log.info("닉네임 변경 요청 - 유저 ID: {}, 변경할 닉네임: {}", userId, request.getNickname());
+        userService.updateNickname(userId, request.getNickname());
 
-        NicknameResponseDto response = userService.setupNickname(targetId, request);
-        return ResponseEntity.ok(ApiResponse.success("닉네임 설정 완료", response));
+        return ResponseEntity.ok(ApiResponse.success("닉네임이 성공적으로 변경되었습니다.", null));
     }
 
     /**
@@ -69,10 +45,9 @@ public class UserController {
      */
     @GetMapping("/me/profile")
     public ResponseEntity<ApiResponse<ProfileResponseDto>> getProfile(
-            @AuthenticationPrincipal Object principal) {
+            @AuthenticationPrincipal Long userId) {
 
-        Long targetId = getUserIdSafely(principal);
-        ProfileResponseDto profile = userService.getProfile(targetId);
+        ProfileResponseDto profile = userService.getProfile(userId);
         return ResponseEntity.ok(ApiResponse.success("프로필 정보 조회 완료", profile));
     }
 
@@ -81,11 +56,10 @@ public class UserController {
      */
     @PostMapping("/lock-setting/set")
     public ResponseEntity<ApiResponse<Void>> setAppLock(
-            @AuthenticationPrincipal Object principal,
+            @AuthenticationPrincipal Long userId,
             @RequestBody @Valid AppLockRequestDto request) {
 
-        Long targetId = getUserIdSafely(principal);
-        appLockService.setAppLock(targetId, request.getPassword());
+        appLockService.setAppLock(userId, request.getPassword());
         return ResponseEntity.ok(ApiResponse.success("앱 잠금 설정이 완료되었습니다.", null));
     }
 
@@ -94,13 +68,12 @@ public class UserController {
      */
     @PostMapping("/lock-setting/verify")
     public ResponseEntity<ApiResponse<Void>> verifyAppLock(
-            @AuthenticationPrincipal Object principal,
+            @AuthenticationPrincipal Long userId,
             @RequestBody @Valid AppLockRequestDto request) {
 
-        Long targetId = getUserIdSafely(principal);
-        log.info("잠금 비밀번호 확인 요청 - 유저 ID: {}", targetId);
+        log.info("잠금 비밀번호 확인 요청 - 유저 ID: {}", userId);
+        appLockService.verifyAppLock(userId, request.getPassword());
 
-        appLockService.verifyAppLock(targetId, request.getPassword());
-        return ResponseEntity.ok(ApiResponse.success("비밀번호 인증 성공", null));
+        return ResponseEntity.ok(ApiResponse.success("비밀번호 인증에 성공했습니다.", null));
     }
 }

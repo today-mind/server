@@ -6,8 +6,7 @@ package com.example.todaymindserver.dto.response;
  */
 public record OauthUserInfo(
         String sub,
-        String email,
-        String nickname
+        String email
 ) {
     // 이제 별도의 public String nickname() { return null; } 메서드는 필요 없습니다.
     // record가 자동으로 getter 메서드를 생성해 줍니다.

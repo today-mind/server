@@ -25,22 +25,9 @@ public class KakaoProvider implements OauthProvider {
 
     @Override
     public OauthUserInfo getUserInfoFromOauthServer(OauthRequestDto request) {
-
         KakaoUserResponse kakaoUserInfo = kakaoOauthClient.getKakaoUserInfo(request.accessToken());
 
-        String sub = kakaoUserInfo.id().toString();
-        String email = kakaoUserInfo.kakaoAccount().email();
-
-        // [수정] 빨간 줄 해결: KakaoUserResponse의 계층 구조에 맞춰 nickname을 가져옵니다.
-        String nickname = (kakaoUserInfo.kakaoAccount() != null && kakaoUserInfo.kakaoAccount().profile() != null)
-                ? kakaoUserInfo.kakaoAccount().profile().nickname()
-                : null;
-
-        // [최종] OauthUserInfo 생성자 인자 3개(sub, email, nickname)를 맞춥니다.
-        return new OauthUserInfo(
-                sub,
-                email,
-                nickname
-        );
+        // 닉네임 없이 id와 email만 전달
+        return new OauthUserInfo(kakaoUserInfo.id().toString(), kakaoUserInfo.kakaoAccount().email());
     }
 }

@@ -58,17 +58,19 @@ public class User implements UserDetails {
 
     private String password; // 앱 잠금용 암호화된 비밀번호
 
-    // AI 페르소나 설정 (MBTI는 필수 수집 항목이 아니므로 기본값 없이 null 허용)
+    /**
+     * [리뷰 반영] 정책에 따라 기본값 T 설정 및 null 허용 안 함
+     */
     @Enumerated(EnumType.STRING)
-    private MbtiType mbtiType;
+    @Column(nullable = false)
+    @Builder.Default
+    private MbtiType mbtiType = MbtiType.T;
 
-    // 말투 설정 (기본값: 존댓말)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
     private ToneType toneType = ToneType.HONORIFIC;
 
-    // 회원 상태
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
@@ -89,6 +91,7 @@ public class User implements UserDetails {
                 .provider(provider)
                 .providerUserId(providerUserId)
                 .nickName(nickName)
+                .mbtiType(MbtiType.T)
                 .status(UserStatus.ACTIVE)
                 .toneType(ToneType.HONORIFIC)
                 .build();

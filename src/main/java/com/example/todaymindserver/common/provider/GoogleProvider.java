@@ -33,17 +33,9 @@ public class GoogleProvider implements OauthProvider {
      */
     @Override
     public OauthUserInfo getUserInfoFromOauthServer(OauthRequestDto request) {
-
         GoogleUserResponse googleUserInfo = googleOauthClient.getGoogleUserInfo(request.accessToken());
 
-        String sub = googleUserInfo.sub();
-        String email = googleUserInfo.email();
-        String name = googleUserInfo.name();
-
-        return new OauthUserInfo(
-                sub,
-                email,
-                name
-        );
+        // 닉네임 없이 sub와 email만 전달
+        return new OauthUserInfo(googleUserInfo.sub(), googleUserInfo.email());
     }
 }
