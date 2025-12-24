@@ -9,6 +9,13 @@ spring:
       ddl-auto: update
     show-sql: true
 
+
+
+clova:
+  completion-url: http://localhost:8080/dummy
+  api-key: dummy_key
+  api-key-id: dummy_id
+
 jwt:
   access-token:
     expire-time: PT1H  # 1시간

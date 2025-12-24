@@ -9,6 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * [빌드 에러 해결] static 키워드를 제거하여 인스턴스 메서드로 변경했습니다.
+ */
 @Service
 @RequiredArgsConstructor
 public class AppLockService {
@@ -21,7 +24,7 @@ public class AppLockService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        // 보안을 위해 4자리 비번도 암호화해서 저장
+        // 암호화하여 저장
         user.updatePassword(passwordEncoder.encode(password));
     }
 
@@ -34,7 +37,6 @@ public class AppLockService {
             throw new BusinessException(ErrorCode.APP_LOCK_NOT_SET);
         }
 
-        // 입력값과 DB의 암호화된 비번 비교
         if (!passwordEncoder.matches(inputPassword, user.getPassword())) {
             throw new BusinessException(ErrorCode.INVALID_APP_PASSWORD);
         }

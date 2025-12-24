@@ -17,6 +17,7 @@ import com.example.todaymindserver.common.util.CustomAccessDeniedHandler;
 import com.example.todaymindserver.common.util.CustomAuthenticationEntryPoint;
 import com.example.todaymindserver.common.util.JwtFilter;
 import com.example.todaymindserver.common.util.JwtUtil;
+import com.example.todaymindserver.common.util.Role;
 import com.example.todaymindserver.service.JwtAuthenticationService;
 
 import lombok.RequiredArgsConstructor;
@@ -41,32 +42,33 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
 
         return httpSecurity
-            .csrf(AbstractHttpConfigurer::disable)
-            .cors(cors -> cors.configurationSource(corsConfigurationSource))
-            .httpBasic(AbstractHttpConfigurer::disable)
-            .formLogin(AbstractHttpConfigurer::disable)
-            .logout(AbstractHttpConfigurer::disable)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/actuator/health").permitAll()
-                .requestMatchers(HttpMethod.POST,
-                    "/oauth/**",
-                    "/auth/token/refresh"
-                ).permitAll()
-                    .requestMatchers("/api/diaries/**").permitAll()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/oauth/**",
+                                "/auth/token/refresh"
+                        ).permitAll()
+                        .requestMatchers("/api/diaries/**").hasRole(Role.USER.name())
+                        .requestMatchers("/api/users/**").hasRole(Role.USER.name())
+                        .requestMatchers("/api/**").authenticated()
 
-                .requestMatchers("/api/**").authenticated()
-                .anyRequest().denyAll()
-            )
+                        .anyRequest().denyAll()
+                )
 
-            .addFilterBefore(new JwtFilter(jwtAuthenticationService, jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(jwtAuthenticationService, jwtUtil), UsernamePasswordAuthenticationFilter.class)
 
-            .exceptionHandling(configurer ->
-                configurer
-                    .authenticationEntryPoint(authenticationEntryPoint)
-                    .accessDeniedHandler(accessDeniedHandler)
-            )
-            .build();
+                .exceptionHandling(configurer ->
+                        configurer
+                                .authenticationEntryPoint(authenticationEntryPoint)
+                                .accessDeniedHandler(accessDeniedHandler)
+                )
+                .build();
     }
 }
