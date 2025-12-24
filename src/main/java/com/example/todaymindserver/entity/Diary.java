@@ -1,6 +1,8 @@
 package com.example.todaymindserver.entity;
 
 import com.example.todaymindserver.common.util.EmotionType;
+import com.example.todaymindserver.common.util.ResponseStatusType;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -47,6 +49,13 @@ public class Diary extends BaseTime { // <--- BaseTimeEntity 상속 추가
     @Column(name = "emotion_type", nullable = false, length = 50)
     private EmotionType emotionType;
 
+    @Column(columnDefinition = "TEXT")
+    private String empatheticResponse;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "response_status_type", nullable = false)
+    private ResponseStatusType responseStatus = ResponseStatusType.PENDING;
+
     /**
      * 일기 생성자
      * @param user 일기를 작성한 사용자 엔티티
@@ -68,5 +77,26 @@ public class Diary extends BaseTime { // <--- BaseTimeEntity 상속 추가
      */
     public static Diary create(User user, String content, EmotionType emotionType) {
         return new Diary(user, content, emotionType);
+    }
+
+    public void updateEmpatheticResponse(String empatheticResponse) {
+        if (empatheticResponse == null || empatheticResponse.isEmpty()) {
+            throw new IllegalArgumentException("empathetic response cannot be null or empty");
+        }
+        this.empatheticResponse = empatheticResponse;
+    }
+
+    public void updateResponseStatusToCompleted() {
+        if (this.responseStatus != ResponseStatusType.PENDING) {
+            throw new IllegalArgumentException("AI 응답 상태가 PENDING이 아닙니다.");
+        }
+        this.responseStatus = ResponseStatusType.COMPLETED;
+    }
+
+    public void updateResponseStatusToFailed() {
+        if (this.responseStatus != ResponseStatusType.PENDING) {
+            throw new IllegalArgumentException("AI 응답 상태가 PENDING이 아닙니다.");
+        }
+        this.responseStatus = ResponseStatusType.FAILED;
     }
 }
