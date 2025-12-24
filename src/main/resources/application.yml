@@ -11,7 +11,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
 oauth:
   kakao:
@@ -25,6 +25,10 @@ jwt:
   refresh-token:
     expire-time: ${REFRESH_TOKEN_EXPIRE_TIME}
   secret-key: ${JWT_SECRET_KEY}
+
+clova:
+  completion-url: ${CLOVA_COMPLETION_URL}
+  api-key: ${CLOVA_API_KEY}
 
 management:
   endpoints:
