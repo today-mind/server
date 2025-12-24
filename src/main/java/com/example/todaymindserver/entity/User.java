@@ -11,11 +11,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
+import lombok.Builder;
 
-// --- 추가된 Import ---
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails; // UserDetails 추가
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -24,8 +24,16 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * 사용자 엔티티 클래스
+ * [수정 사항]
+ * 1. MbtiType.NONE 참조 제거 (빌드 에러 해결 및 정책 준수)
+ * 2. MBTI 미설정 시 null로 관리하도록 기본값 제거
+ * 3. UserDetails 구현 유지 및 필드 정리
+ */
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
@@ -35,32 +43,37 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column
-    private String nickName; // Unique 제거된 상태
+    @Column(nullable = false)
+    private String nickName;
 
+    @Column(nullable = false)
     private String email;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private OauthProviderType provider;
 
     @Column(nullable = false, unique = true)
     private String providerUserId;
 
-    // AI 페르소나 설정 (MyPage API 담당)
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MbtiType mbtiType = MbtiType.NONE;
+    private String password; // 앱 잠금용 암호화된 비밀번호
 
+    // AI 페르소나 설정 (MBTI는 필수 수집 항목이 아니므로 기본값 없이 null 허용)
+    @Enumerated(EnumType.STRING)
+    private MbtiType mbtiType;
+
+    // 말투 설정 (기본값: 존댓말)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private ToneType toneType = ToneType.HONORIFIC;
 
-    // 3. 회원 상태 (MyPage API 담당)
+    // 회원 상태
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
 
-    // 4. Auditing
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -68,50 +81,47 @@ public class User implements UserDetails {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-    private String password;
 
-    // OAuth용 생성자 (김용준 님 코드)
-    private User(String email, OauthProviderType provider, String providerUserId) {
-        this.email = email;
-        this.provider = provider;
-        this.providerUserId = providerUserId;
+    // OAuth용 정적 팩토리 메서드
+    public static User create(String email, OauthProviderType provider, String providerUserId, String nickName) {
+        return User.builder()
+                .email(email)
+                .provider(provider)
+                .providerUserId(providerUserId)
+                .nickName(nickName)
+                .status(UserStatus.ACTIVE)
+                .toneType(ToneType.HONORIFIC)
+                .build();
     }
 
-    public static User create (String email, OauthProviderType provider, String providerUserId) {
-        return new User(
-                email,
-                provider,
-                providerUserId
-        );
-    }
-
-    // 닉네임 설정을 위한 메서드
+    // 닉네임 수정
     public void updateNickname(String nickname) {
         this.nickName = nickname;
     }
 
-    // 앱 잠금 비밀번호 설정을 위한 메서드
+    // 앱 잠금 비밀번호 수정
     public void updatePassword(String password) {
         this.password = password;
     }
 
-    // AI 설정 변경을 위한 메서드
+    // AI 설정 수정 (ToneType은 null이 들어오지 않도록 방어 로직 권장)
     public void updateAiSettings(MbtiType mbtiType, ToneType toneType) {
         this.mbtiType = mbtiType;
-        this.toneType = toneType;
+        if (toneType != null) {
+            this.toneType = toneType;
+        }
     }
 
-    // --- UserDetails 오버라이드 메서드 (AuthenticationPrincipal 사용 필수) ---
+    // --- UserDetails 오버라이드 메서드 ---
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 권한 설정이 없으므로 임시로 빈 리스트 반환
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
     public String getUsername() {
-        return String.valueOf(this.userId); // 인증 주체(Principal)로 userId를 사용
+        return String.valueOf(this.userId); // 인증 주체로 userId 사용
     }
 
     @Override
@@ -132,9 +142,5 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return this.status == UserStatus.ACTIVE;
-    }
-
-    public KeyValues getDiaries() {
-        return null;
     }
 }
