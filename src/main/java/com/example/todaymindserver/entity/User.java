@@ -20,10 +20,10 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * [충돌 해결 완료] 사용자 엔티티 클래스
+ * [최종 충돌 해결 완료] 사용자 엔티티 클래스
  * 1. MBTI 정책 반영 (기본값 T, Null 불가)
- * 2. UserDetails 인터페이스 구현 유지
- * 3. 롬복 @Builder 적용 및 충돌 마커 제거
+ * 2. UserDetails 인터페이스 구현 (인증용)
+ * 3. AuditingEntityListener 적용
  */
 @Entity
 @Getter
@@ -86,7 +86,7 @@ public class User implements UserDetails {
                 .provider(provider)
                 .providerUserId(providerUserId)
                 .nickName(nickName)
-                .mbtiType(MbtiType.T)
+                .mbtiType(MbtiType.T) // 생성 시 정책 준수
                 .status(UserStatus.ACTIVE)
                 .toneType(ToneType.HONORIFIC)
                 .build();
@@ -102,7 +102,7 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    // AI 설정 수정
+    // AI 설정 수정 (null 체크를 통해 정책 보호)
     public void updateAiSettings(MbtiType mbtiType, ToneType toneType) {
         if (mbtiType != null) {
             this.mbtiType = mbtiType;
