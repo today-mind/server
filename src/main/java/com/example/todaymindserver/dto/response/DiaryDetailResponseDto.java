@@ -1,6 +1,7 @@
 package com.example.todaymindserver.dto.response;
 
 import com.example.todaymindserver.common.util.EmotionType;
+import com.example.todaymindserver.common.util.ResponseStatusType;
 import com.example.todaymindserver.entity.Diary;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,18 +19,19 @@ public class DiaryDetailResponseDto {
     private final Long diaryId;
     private final String content; // 일기 원문
     private final EmotionType emotionType;
+    private final String empatheticResponse;
+    private final ResponseStatusType responseStatusType;
     private final LocalDateTime createdAt;
 
-    // [TODO] AiFeedback 엔티티 구현 전까지는 String으로 처리
-    private final String aiReply; // AI 답변 내용
 
-    public static DiaryDetailResponseDto from(Diary diary, String aiReply) {
+    public static DiaryDetailResponseDto from(Diary diary) {
         return DiaryDetailResponseDto.builder()
                 .diaryId(diary.getDiaryId())
                 .content(diary.getContent())
                 .emotionType(diary.getEmotionType())
-                .createdAt(diary.getCreatedAt()) // BaseTimeEntity에서 상속받은 createdAt 사용
-                .aiReply(aiReply)
+                .empatheticResponse(diary.getEmpatheticResponse())
+                .responseStatusType(diary.getResponseStatus())
+                .createdAt(diary.getCreatedAt())
                 .build();
     }
 }

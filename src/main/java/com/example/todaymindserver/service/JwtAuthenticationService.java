@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.example.todaymindserver.common.util.JwtProvider;
+import com.example.todaymindserver.common.util.Role;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class JwtAuthenticationService {
         return new UsernamePasswordAuthenticationToken(
             userId,
             null,
-            List.of()
+            List.of(Role.USER)
         );
     }
 }
