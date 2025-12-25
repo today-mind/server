@@ -3,7 +3,9 @@ package com.example.todaymindserver.service;
 import com.example.todaymindserver.common.response.dto.ProfileResponseDto;
 import com.example.todaymindserver.dto.request.NicknameRequestDto;
 import com.example.todaymindserver.dto.response.NicknameResponseDto;
-import com.example.todaymindserver.entity.User;
+import com.example.todaymindserver.domain.BusinessException;
+import com.example.todaymindserver.domain.user.User;
+import com.example.todaymindserver.domain.user.UserErrorCode;
 import com.example.todaymindserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +30,7 @@ public class UserService {
     public NicknameResponseDto setupNickname(Long userId, NicknameRequestDto request) {
         // [TODO] OAuth 구현 후에는 @AuthenticationPrincipal User user를 사용해야 합니다.
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. (ID: " + userId + ")"));
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
         // 닉네임 중복 체크
         checkNicknameDuplication(request.getNickname());
@@ -46,7 +48,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public ProfileResponseDto getProfile(Long userId) { // 반환 타입을 User -> ProfileResponseDto로 변경
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
         // 엔티티(User)를 응답 DTO로 변환하여 반환
         return ProfileResponseDto.builder()

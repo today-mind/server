@@ -5,8 +5,11 @@ import com.example.todaymindserver.dto.request.DiaryRequestDto;
 import com.example.todaymindserver.dto.response.DiaryCalendarResponseDto; // Import 추가
 import com.example.todaymindserver.dto.response.DiaryDetailResponseDto; // Import 추가
 import com.example.todaymindserver.dto.response.DiaryResponseDto;
-import com.example.todaymindserver.entity.Diary;
-import com.example.todaymindserver.entity.User;
+import com.example.todaymindserver.domain.BusinessException;
+import com.example.todaymindserver.domain.diary.Diary;
+import com.example.todaymindserver.domain.diary.DiaryErrorCode;
+import com.example.todaymindserver.domain.user.User;
+import com.example.todaymindserver.domain.user.UserErrorCode;
 import com.example.todaymindserver.repository.DiaryRepository;
 import com.example.todaymindserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +51,7 @@ public class DiaryService {
 
         // 1. User 엔티티 조회
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. (ID: " + userId + ")"));
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
         // 2. Diary 엔티티 생성 및 저장
         Diary diary = Diary.create(
@@ -97,7 +100,7 @@ public class DiaryService {
 
         // 2. User 엔티티 조회
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. (ID: " + userId + ")"));
+            .orElseThrow(() -> new BusinessException(DiaryErrorCode.DIARY_NOT_FOUND));
 
         // 3. DB에서 해당 월의 일기 목록 조회 (특정 사용자의 일기만)
         List<Diary> diaries = diaryRepository.findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(
@@ -129,7 +132,7 @@ public class DiaryService {
 
         // 1. Diary 조회 및 권한 검증 (해당 일기가 이 유저의 것인지 확인)
         Diary foundDiary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new IllegalArgumentException("일기를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(DiaryErrorCode.DIARY_NOT_FOUND));
 
         if (!foundDiary.getUser().getUserId().equals(userId)) {
             // 여기에 CustomAccessDeniedException 같은 권한 예외를 던져야 합니다.

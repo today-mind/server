@@ -6,11 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.todaymindserver.common.provider.OauthProvider;
 import com.example.todaymindserver.common.util.JwtProvider;
 import com.example.todaymindserver.common.factory.OauthProviderFactory;
-import com.example.todaymindserver.common.util.OauthProviderType;
+import com.example.todaymindserver.domain.oauth.OauthProviderType;
 import com.example.todaymindserver.dto.request.OauthRequestDto;
 import com.example.todaymindserver.dto.response.LoginResponseDto;
 import com.example.todaymindserver.dto.response.OauthUserInfo;
-import com.example.todaymindserver.entity.User;
+import com.example.todaymindserver.domain.user.User;
 import com.example.todaymindserver.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
