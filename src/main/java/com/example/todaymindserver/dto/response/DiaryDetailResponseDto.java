@@ -1,8 +1,8 @@
 package com.example.todaymindserver.dto.response;
 
-import com.example.todaymindserver.common.util.EmotionType;
-import com.example.todaymindserver.common.util.ResponseStatusType;
-import com.example.todaymindserver.entity.Diary;
+import com.example.todaymindserver.domain.user.EmotionType;
+import com.example.todaymindserver.domain.user.ResponseStatusType;
+import com.example.todaymindserver.domain.diary.Diary;
 import lombok.Builder;
 import lombok.Getter;
 

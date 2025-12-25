@@ -7,7 +7,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.example.todaymindserver.common.provider.OauthProvider;
-import com.example.todaymindserver.common.util.OauthProviderType;
+import com.example.todaymindserver.domain.oauth.OauthProviderType;
 
 @Component
 public class OauthProviderFactory {

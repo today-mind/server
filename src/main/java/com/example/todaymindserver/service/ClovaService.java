@@ -4,7 +4,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.todaymindserver.common.client.dto.ClovaResponse;
-import com.example.todaymindserver.entity.Diary;
+import com.example.todaymindserver.domain.BusinessException;
+import com.example.todaymindserver.domain.diary.Diary;
+import com.example.todaymindserver.domain.diary.DiaryErrorCode;
 import com.example.todaymindserver.repository.DiaryRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,7 @@ public class ClovaService {
 
         if (diary == null) {
             log.error("해당 ID는 일기가 존재하지 않습니다. 일기 ID={}", diaryId);
-            throw new RuntimeException("존재하지 않는 일기입니다.");
+            throw new BusinessException(DiaryErrorCode.DIARY_NOT_FOUND);
         }
 
         try {

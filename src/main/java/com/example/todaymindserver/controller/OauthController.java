@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.todaymindserver.common.util.OauthProviderType;
+import com.example.todaymindserver.domain.oauth.OauthProviderType;
 import com.example.todaymindserver.dto.request.OauthRequestDto;
 import com.example.todaymindserver.dto.response.LoginResponseDto;
 import com.example.todaymindserver.service.OauthService;

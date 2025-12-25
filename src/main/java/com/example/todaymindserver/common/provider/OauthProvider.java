@@ -1,6 +1,6 @@
 package com.example.todaymindserver.common.provider;
 
-import com.example.todaymindserver.common.util.OauthProviderType;
+import com.example.todaymindserver.domain.oauth.OauthProviderType;
 import com.example.todaymindserver.dto.request.OauthRequestDto;
 import com.example.todaymindserver.dto.response.OauthUserInfo;
 
