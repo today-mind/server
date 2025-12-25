@@ -2,6 +2,7 @@ package com.example.todaymindserver.controller;
 
 import com.example.todaymindserver.common.response.ApiResponse;
 import com.example.todaymindserver.common.response.dto.ProfileResponseDto;
+import com.example.todaymindserver.dto.request.AiSettingsRequestDto;
 import com.example.todaymindserver.dto.request.AppLockRequestDto;
 import com.example.todaymindserver.dto.request.NicknameRequestDto;
 import com.example.todaymindserver.dto.response.NicknameResponseDto;
@@ -75,5 +76,22 @@ public class UserController {
         appLockService.verifyAppLock(userId, request.getPassword());
 
         return ResponseEntity.ok(ApiResponse.success("비밀번호 인증에 성공했습니다.", null));
+    }
+
+    /**
+     * [Branch 5] AI 답장 설정 변경
+     * 명세서 주소: PATCH /api/users/ai-setting
+     * 명세서 응답 메시지: "설정이 완료되었습니다."
+     */
+    @PatchMapping("/ai-setting")
+    public ApiResponse<Void> updateAiSettings(
+            @AuthenticationPrincipal Long userId,
+            @RequestBody @Valid AiSettingsRequestDto request) {
+
+        log.info("AI 설정 변경 요청 - UserID: {}, Personality: {}, Speech: {}",
+                userId, request.getPersonalityType(), request.getSpeechStyle());
+
+        userService.updateAiSettings(userId, request);
+        return (ApiResponse<Void>) ApiResponse.success("설정이 완료되었습니다.");
     }
 }

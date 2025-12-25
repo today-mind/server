@@ -1,6 +1,7 @@
 package com.example.todaymindserver.service;
 
 import com.example.todaymindserver.common.response.dto.ProfileResponseDto;
+import com.example.todaymindserver.dto.request.AiSettingsRequestDto;
 import com.example.todaymindserver.dto.request.NicknameRequestDto;
 import com.example.todaymindserver.dto.response.NicknameResponseDto;
 import com.example.todaymindserver.domain.BusinessException;
@@ -60,4 +61,16 @@ public class UserService {
 
     /* 3. AI 설정 변경 */
     // 이 외에 updatePassword, updateAiSettings 등 나머지 MyPage 로직이 여기에 추가될 수 있습니다.
+
+    /** * [Branch 5] AI 설정 변경
+     * 명세서의 필드를 도메인 모델(mbtiType, toneType)로 매핑하여 저장합니다.
+     */
+    @Transactional
+    public void updateAiSettings(Long userId, AiSettingsRequestDto request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+
+        // DTO의 personalityType -> mbtiType / speechStyle -> toneType 으로 업데이트
+        user.updateAiSettings(request.getPersonalityType(), request.getSpeechStyle());
+    }
 }
