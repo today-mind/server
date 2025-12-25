@@ -3,8 +3,6 @@ package com.example.todaymindserver.domain.user;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-/**
- */
 @Getter
 @RequiredArgsConstructor
 public enum ToneType {
@@ -18,13 +16,9 @@ public enum ToneType {
             return HONORIFIC;
         }
 
-        String upperTone = tone.toUpperCase();
         try {
-            return ToneType.valueOf(upperTone);
+            return ToneType.valueOf(tone.toUpperCase());
         } catch (IllegalArgumentException e) {
-            if ("BANMAL".equals(upperTone)) {
-                return INFORMAL;
-            }
             return HONORIFIC;
         }
     }
