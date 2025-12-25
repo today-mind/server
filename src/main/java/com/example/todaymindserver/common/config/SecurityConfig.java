@@ -52,6 +52,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/actuator/health").permitAll()
                 .requestMatchers(HttpMethod.POST,
+                        "/api/auth/test-token",
                     "/oauth/**",
                     "/auth/token/refresh"
                 ).permitAll()
