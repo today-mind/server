@@ -51,9 +51,9 @@ public class UserController {
     }
 
     /**
-     * 3. 앱 잠금 비밀번호 설정 (POST /api/users/lock-setting/set)
+     * 3. 앱 잠금 비밀번호 설정 (PATCH /api/users/lock-setting/set)
      */
-    @PostMapping("/lock-setting/set")
+    @PatchMapping ("/lock-setting/set")
     public ResponseEntity<ApiResponse<Void>> setAppLock(
             @AuthenticationPrincipal Long userId,
             @RequestBody @Valid AppLockRequestDto request) {
