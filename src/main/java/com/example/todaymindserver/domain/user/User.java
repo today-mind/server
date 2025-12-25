@@ -1,9 +1,6 @@
-package com.example.todaymindserver.entity;
+package com.example.todaymindserver.domain.user;
 
-import com.example.todaymindserver.common.util.MbtiType;
-import com.example.todaymindserver.common.util.OauthProviderType;
-import com.example.todaymindserver.common.util.ToneType;
-import com.example.todaymindserver.common.util.UserStatus;
+import com.example.todaymindserver.domain.oauth.OauthProviderType;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

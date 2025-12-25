@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.example.todaymindserver.common.util.JwtProvider;
 import com.example.todaymindserver.common.util.Role;
+import com.example.todaymindserver.domain.BusinessException;
+import com.example.todaymindserver.domain.token.TokenErrorCode;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +28,7 @@ public class JwtAuthenticationService {
         String type = jwtProvider.extractTokenType(claims);
         if (!jwtProvider.getAccessTokenTypeValue().equals(type)) {
             log.error("Access token type이 아닙니다.");
-            throw new RuntimeException("유효하지 않는 토큰입니다.");
+            throw new BusinessException(TokenErrorCode.INVALID_ACCESS_TOKEN);
         }
 
         Long userId = jwtProvider.extractUserId(claims);

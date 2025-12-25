@@ -7,7 +7,9 @@ import com.example.todaymindserver.common.policy.RefreshTokenPolicy;
 import com.example.todaymindserver.common.util.JwtProvider;
 import com.example.todaymindserver.dto.request.RefreshTokenRequestDto;
 import com.example.todaymindserver.dto.response.RefreshTokenResponseDto;
-import com.example.todaymindserver.entity.RefreshToken;
+import com.example.todaymindserver.domain.BusinessException;
+import com.example.todaymindserver.domain.token.RefreshToken;
+import com.example.todaymindserver.domain.token.TokenErrorCode;
 import com.example.todaymindserver.repository.RefreshTokenRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -65,7 +67,7 @@ public class RefreshTokenService {
         RefreshToken storedRefreshToken = refreshTokenRepository.findById(userId)
             .orElseThrow(() -> {
                 log.error("사용자 {} 에 대한 RefreshToken 엔티티가 존재하지 않습니다.", userId);
-                return new IllegalArgumentException("RefreshToken 없음");
+                return new BusinessException(TokenErrorCode.NOT_FOUND_REFRESH_TOKEN);
             });
 
         refreshTokenPolicy.validateStoredTokenMatch(inputToken, storedRefreshToken);

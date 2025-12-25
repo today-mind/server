@@ -1,8 +1,8 @@
 package com.example.todaymindserver.common.event.dto;
 
-import com.example.todaymindserver.common.util.EmotionType;
-import com.example.todaymindserver.common.util.MbtiType;
-import com.example.todaymindserver.common.util.ToneType;
+import com.example.todaymindserver.domain.user.EmotionType;
+import com.example.todaymindserver.domain.user.MbtiType;
+import com.example.todaymindserver.domain.user.ToneType;
 
 public record EmpatheticResponseEvent(
     Long diaryId,

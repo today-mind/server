@@ -1,6 +1,6 @@
 package com.example.todaymindserver.dto.request;
 
-import com.example.todaymindserver.common.util.EmotionType;
+import com.example.todaymindserver.domain.user.EmotionType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

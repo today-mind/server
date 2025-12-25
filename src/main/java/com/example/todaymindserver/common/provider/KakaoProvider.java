@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.todaymindserver.common.client.kakao.KakaoOauthClient;
 import com.example.todaymindserver.common.client.dto.KakaoUserResponse;
-import com.example.todaymindserver.common.util.OauthProviderType;
+import com.example.todaymindserver.domain.oauth.OauthProviderType;
 import com.example.todaymindserver.dto.request.OauthRequestDto;
 import com.example.todaymindserver.dto.response.OauthUserInfo;
 
