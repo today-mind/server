@@ -19,10 +19,10 @@ public class GlobalExceptionHandler {
         log.error("오류 내용: {}", e.getMessage(), e);
 
         ErrorResponse response = ErrorResponse.builder()
-            .status(e.getErrorCode().getHttpStatus().value())
-            .code(e.getErrorCode().getHttpStatus().name())
-            .message(e.getErrorCode().getMessage())
-            .build();
+                .status(e.getErrorCode().getHttpStatus().value())
+                .code(e.getErrorCode().getHttpStatus().name())
+                .message(e.getErrorCode().getMessage())
+                .build();
 
         return ResponseEntity.status(e.getErrorCode().getHttpStatus().value()).body(response);
     }
@@ -34,10 +34,10 @@ public class GlobalExceptionHandler {
         log.error("오류 내용: {}", e.getMessage(), e);
 
         ErrorResponse response = ErrorResponse.builder()
-            .status(500)
-            .code("INTERNAL_SERVER_ERROR")
-            .message("알 수 없는 오류입니다.")
-            .build();
+                .status(500)
+                .code("INTERNAL_SERVER_ERROR")
+                .message("알 수 없는 오류입니다.")
+                .build();
 
         return ResponseEntity.status(500).body(response);
     }

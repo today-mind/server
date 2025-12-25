@@ -2,6 +2,7 @@ package com.example.todaymindserver.domain.user;
 
 import com.example.todaymindserver.domain.oauth.OauthProviderType;
 
+import io.swagger.v3.oas.annotations.info.Contact;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
