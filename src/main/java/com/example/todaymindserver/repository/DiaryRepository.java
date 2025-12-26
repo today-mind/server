@@ -25,8 +25,10 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
      * @return 해당 기간의 일기 목록 (List<Diary>)
      */
     List<Diary> findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(
-            User user,
-            LocalDateTime startOfMonth,
-            LocalDateTime endOfMonth
+        User user,
+        LocalDateTime startOfMonth,
+        LocalDateTime endOfMonth
     );
+
+    void deleteAllByUser_UserId(Long userUserId);
 }
