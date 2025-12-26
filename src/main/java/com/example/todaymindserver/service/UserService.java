@@ -62,15 +62,26 @@ public class UserService {
     /* 3. AI 설정 변경 */
     // 이 외에 updatePassword, updateAiSettings 등 나머지 MyPage 로직이 여기에 추가될 수 있습니다.
 
-    /** * [Branch 5] AI 설정 변경
-     * 명세서의 필드를 도메인 모델(mbtiType, toneType)로 매핑하여 저장합니다.
+    /**
+     * [Branch 5 수정] AI 설정 변경
+     * null이 아닌 값(입력된 값)만 선택적으로 업데이트합니다.
      */
     @Transactional
     public void updateAiSettings(Long userId, AiSettingsRequestDto request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        // DTO의 personalityType -> mbtiType / speechStyle -> toneType 으로 업데이트
-        user.updateAiSettings(request.getPersonalityType(), request.getSpeechStyle());
+        // 1. 성향(Personality)이 들어온 경우에만 수정
+        if (request.getPersonalityType() != null) {
+            user.updateAiSettings(request.getPersonalityType(), user.getToneType());
+        }
+
+        // 2. 말투(SpeechStyle)가 들어온 경우에만 수정
+        if (request.getSpeechStyle() != null) {
+            user.updateAiSettings(user.getMbtiType(), request.getSpeechStyle());
+        }
+
+        // 참고: User 엔티티의 updateAiSettings가 두 인자를 다 받으므로 위와 같이 처리하거나,
+        // 엔티티에 개별 setter/update 메서드를 만드는 것이 좋습니다.
     }
 }
