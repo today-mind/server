@@ -1,5 +1,6 @@
 package com.example.todaymindserver.domain.diary;
 
+import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.user.EmotionType;
 import com.example.todaymindserver.domain.user.ResponseStatusType;
 import com.example.todaymindserver.domain.BaseTime;
@@ -58,46 +59,30 @@ public class Diary extends BaseTime { // <--- BaseTimeEntity 상속 추가
     @Column(name = "response_status_type", nullable = false)
     private ResponseStatusType responseStatus = ResponseStatusType.PENDING;
 
-    /**
-     * 일기 생성자
-     * @param user 일기를 작성한 사용자 엔티티
-     * @param content 일기 내용
-     * @param emotionType 일기 감정 유형
-     */
     private Diary(User user, String content, EmotionType emotionType) {
         this.user = user;
         this.content = content;
         this.emotionType = emotionType;
     }
 
-    /**
-     * 일기 엔티티 생성 팩토리 메서드
-     * @param user 사용자 엔티티
-     * @param content 일기 내용
-     * @param emotionType 일기 감정 유형
-     * @return 생성된 Diary 엔티티
-     */
     public static Diary create(User user, String content, EmotionType emotionType) {
         return new Diary(user, content, emotionType);
     }
 
     public void updateEmpatheticResponse(String empatheticResponse) {
-        if (empatheticResponse == null || empatheticResponse.isEmpty()) {
-            throw new IllegalArgumentException("empathetic response cannot be null or empty");
-        }
         this.empatheticResponse = empatheticResponse;
     }
 
     public void updateResponseStatusToCompleted() {
         if (this.responseStatus != ResponseStatusType.PENDING) {
-            throw new IllegalArgumentException("AI 응답 상태가 PENDING이 아닙니다.");
+            throw new BusinessException(ClovaErrorCode.EMPATHETIC_RESPONSE_STATUS_CONFLICT);
         }
         this.responseStatus = ResponseStatusType.COMPLETED;
     }
 
     public void updateResponseStatusToFailed() {
         if (this.responseStatus != ResponseStatusType.PENDING) {
-            throw new IllegalArgumentException("AI 응답 상태가 PENDING이 아닙니다.");
+            throw new BusinessException(ClovaErrorCode.EMPATHETIC_RESPONSE_STATUS_CONFLICT);
         }
         this.responseStatus = ResponseStatusType.FAILED;
     }

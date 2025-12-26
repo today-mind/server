@@ -78,11 +78,22 @@ public class UserController {
     /**
      * 로그 아웃
      */
-    @PostMapping("/users/me/logout")
+    @PostMapping("/me/logout")
     public ApiResponse<Void> logout(
         @AuthenticationPrincipal Long userId
     ) {
         userService.logout(userId);
         return ApiResponse.success("사용자가 로그아웃 완료", null);
+    }
+
+    /**
+     * 회원 탈퇴
+     */
+    @DeleteMapping("/me")
+    public ApiResponse<Void> delete (
+        @AuthenticationPrincipal Long userId
+    ) {
+        userService.delete(userId);
+        return ApiResponse.success("사용자 회원탈퇴 완료", null);
     }
 }
