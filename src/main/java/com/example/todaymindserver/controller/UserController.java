@@ -14,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-/**
- */
 @Slf4j
 @RestController
 @RequestMapping("/api/users")
@@ -75,5 +73,16 @@ public class UserController {
         appLockService.verifyAppLock(userId, request.getPassword());
 
         return ResponseEntity.ok(ApiResponse.success("비밀번호 인증에 성공했습니다.", null));
+    }
+
+    /**
+     * 로그 아웃
+     */
+    @PostMapping("/users/me/logout")
+    public ApiResponse<Void> logout(
+        @AuthenticationPrincipal Long userId
+    ) {
+        userService.logout(userId);
+        return ApiResponse.success("사용자가 로그아웃 완료", null);
     }
 }
