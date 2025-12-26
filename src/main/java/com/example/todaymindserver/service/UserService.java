@@ -56,6 +56,7 @@ public class UserService {
         // 엔티티(User)를 응답 DTO로 변환하여 반환
         return ProfileResponseDto.builder()
                 .nickname(user.getNickName())
+                .email(user.getEmail())
                 .mbtiType(user.getMbtiType())
                 .toneType(user.getToneType())
                 .build();
