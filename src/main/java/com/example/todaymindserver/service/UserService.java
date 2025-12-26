@@ -1,6 +1,8 @@
 package com.example.todaymindserver.service;
 
 import com.example.todaymindserver.common.response.dto.ProfileResponseDto;
+import com.example.todaymindserver.domain.user.MbtiType;
+import com.example.todaymindserver.domain.user.ToneType;
 import com.example.todaymindserver.dto.request.AiSettingsRequestDto;
 import com.example.todaymindserver.dto.request.NicknameRequestDto;
 import com.example.todaymindserver.dto.response.NicknameResponseDto;
@@ -63,25 +65,25 @@ public class UserService {
     // 이 외에 updatePassword, updateAiSettings 등 나머지 MyPage 로직이 여기에 추가될 수 있습니다.
 
     /**
-     * [Branch 5 수정] AI 설정 변경
-     * null이 아닌 값(입력된 값)만 선택적으로 업데이트합니다.
+     * [Branch 5 수정] AI 설정 변경 (Partial Update 방식)
+     * 리액트(프론트)에서 하나만 보낼 경우를 대비해 null 체크 후 기존 값을 유지합니다.
      */
     @Transactional
     public void updateAiSettings(Long userId, AiSettingsRequestDto request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        // 1. 성향(Personality)이 들어온 경우에만 수정
-        if (request.getPersonalityType() != null) {
-            user.updateAiSettings(request.getPersonalityType(), user.getToneType());
-        }
+        // 삼항 연산자를 사용하여 요청값이 null이면 기존(user.get...) 값을 유지하도록 합니다.
+        MbtiType finalMbti = (request.getPersonalityType() != null)
+                ? request.getPersonalityType()
+                : user.getMbtiType();
 
-        // 2. 말투(SpeechStyle)가 들어온 경우에만 수정
-        if (request.getSpeechStyle() != null) {
-            user.updateAiSettings(user.getMbtiType(), request.getSpeechStyle());
-        }
+        ToneType finalTone = (request.getSpeechStyle() != null)
+                ? request.getSpeechStyle()
+                : user.getToneType();
 
+        user.updateAiSettings(finalMbti, finalTone);
+    }
         // 참고: User 엔티티의 updateAiSettings가 두 인자를 다 받으므로 위와 같이 처리하거나,
         // 엔티티에 개별 setter/update 메서드를 만드는 것이 좋습니다.
-    }
 }
