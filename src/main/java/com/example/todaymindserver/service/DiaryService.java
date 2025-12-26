@@ -1,6 +1,7 @@
 package com.example.todaymindserver.service;
 
 import com.example.todaymindserver.common.event.dto.EmpatheticResponseEvent;
+import com.example.todaymindserver.domain.user.EmotionType;
 import com.example.todaymindserver.dto.request.DiaryRequestDto;
 import com.example.todaymindserver.dto.response.DiaryCalendarResponseDto; // Import 추가
 import com.example.todaymindserver.dto.response.DiaryDetailResponseDto; // Import 추가
@@ -10,6 +11,7 @@ import com.example.todaymindserver.domain.diary.Diary;
 import com.example.todaymindserver.domain.diary.DiaryErrorCode;
 import com.example.todaymindserver.domain.user.User;
 import com.example.todaymindserver.domain.user.UserErrorCode;
+import com.example.todaymindserver.dto.response.EmotionReportResponseDto;
 import com.example.todaymindserver.repository.DiaryRepository;
 import com.example.todaymindserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -141,5 +144,42 @@ public class DiaryService {
 
         // 3. DTO 반환
         return DiaryDetailResponseDto.from(foundDiary);
+    }
+
+    /**
+     * [Step 3] 감정 통계 리포트 생성 로직
+     * 1. 유저 존재 여부 확인
+     * 2. 요청된 년/월의 시작일과 종료일(다음달 1일) 계산
+     * 3. 해당 기간의 일기들을 DB에서 조회
+     * 4. Java Stream을 이용해 감정별로 그룹화 및 카운팅
+     */
+    public EmotionReportResponseDto getEmotionReport(Long userId, int year, int month) {
+        // 1. 유저 조회 (없으면 예외 발생)
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+
+        // 2. 해당 월의 시작일 (예: 12월 1일 00:00:00)
+        LocalDateTime startOfMonth = LocalDateTime.of(year, month, 1, 0, 0);
+        // 다음 달의 시작일 (예: 1월 1일 00:00:00) - 쿼리 조건에서 < end로 사용
+        LocalDateTime startOfNextMonth = startOfMonth.plusMonths(1);
+
+        // 3. Repository를 통해 기간 내 일기 목록 조회
+        List<Diary> diaries = diaryRepository.findAllByUserAndCreatedAtBetween(user, startOfMonth, startOfNextMonth);
+
+        // 4. 감정별 그룹화 및 개수 집계
+        // diary.getEmotionType().name() -> "HAPPY", "SAD" 등의 문자열을 키로 사용합니다.
+        Map<EmotionType, Long> emotionCounts = diaries.stream()
+                .collect(Collectors.groupingBy(
+                        diary -> EmotionType.valueOf(diary.getEmotionType().name()),
+                        Collectors.counting()
+                ));
+
+        // 5. 최종 DTO 생성 및 반환
+        return EmotionReportResponseDto.builder()
+                .year(year)
+                .month(month)
+                .totalCount(diaries.size())
+                .emotionCounts(emotionCounts)
+                .build();
     }
 }

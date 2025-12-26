@@ -4,6 +4,8 @@ import com.example.todaymindserver.domain.diary.Diary;
 import com.example.todaymindserver.domain.user.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -28,6 +30,17 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
         User user,
         LocalDateTime startOfMonth,
         LocalDateTime endOfMonth
+    );
+
+    /**
+     * 특정 기간 내의 일기 목록 조회
+     * JPQL을 사용하여 사용자와 생성일 범위를 조건으로 데이터를 가져옵니다.
+     */
+    @Query("SELECT d FROM Diary d WHERE d.user = :user AND d.createdAt >= :start AND d.createdAt < :end")
+    List<Diary> findAllByUserAndCreatedAtBetween(
+            @Param("user") User user,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
     );
 
     void deleteAllByUser_UserId(Long userUserId);

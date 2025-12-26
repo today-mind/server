@@ -2,9 +2,10 @@ package com.example.todaymindserver.controller;
 
 import com.example.todaymindserver.common.response.ApiResponse;
 import com.example.todaymindserver.dto.request.DiaryRequestDto;
-import com.example.todaymindserver.dto.response.DiaryCalendarResponseDto; // Import 추가
-import com.example.todaymindserver.dto.response.DiaryDetailResponseDto; // Import 추가
+import com.example.todaymindserver.dto.response.DiaryCalendarResponseDto;
+import com.example.todaymindserver.dto.response.DiaryDetailResponseDto;
 import com.example.todaymindserver.dto.response.DiaryResponseDto;
+import com.example.todaymindserver.dto.response.EmotionReportResponseDto;
 import com.example.todaymindserver.service.DiaryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -69,5 +70,20 @@ public class DiaryController {
 
         DiaryDetailResponseDto response = diaryService.getDiaryDetail(userId, diaryId);
         return ApiResponse.success("일기 상세 조회가 완료되었습니다.", response);
+    }
+
+    /**
+     * 감정 통계 리포트 조회
+     * GET /api/diaries/report?year=2025&month=12
+     */
+    @GetMapping("/report")
+    public ApiResponse<EmotionReportResponseDto> getEmotionReport(
+            @AuthenticationPrincipal Long userId,
+            @RequestParam int year,
+            @RequestParam int month) {
+
+        EmotionReportResponseDto report = diaryService.getEmotionReport(userId, year, month);
+
+        return ApiResponse.success("감정 리포트 조회 완료", report);
     }
 }
