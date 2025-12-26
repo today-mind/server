@@ -6,17 +6,24 @@ import com.example.todaymindserver.dto.response.NicknameResponseDto;
 import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.user.User;
 import com.example.todaymindserver.domain.user.UserErrorCode;
+import com.example.todaymindserver.repository.DiaryRepository;
+import com.example.todaymindserver.repository.RefreshTokenRepository;
 import com.example.todaymindserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class UserService {
 
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final DiaryRepository diaryRepository;
 
     // 헬퍼 메서드: 닉네임 중복 체크
     private void checkNicknameDuplication(String nickname) {
@@ -60,4 +67,14 @@ public class UserService {
 
     /* 3. AI 설정 변경 */
     // 이 외에 updatePassword, updateAiSettings 등 나머지 MyPage 로직이 여기에 추가될 수 있습니다.
+
+    @Transactional
+    public void logout(Long userId) {
+        if(!userRepository.existsById(userId)) {
+            log.error("사용자가 존재하지 않습니다. userId={}", userId);
+            throw new BusinessException(UserErrorCode.USER_NOT_FOUND);
+        }
+
+        refreshTokenRepository.deleteByUserId(userId);
+    }
 }

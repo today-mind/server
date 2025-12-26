@@ -7,4 +7,5 @@ import com.example.todaymindserver.domain.token.RefreshToken;
 
 @Repository
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
+    void deleteByUserId(Long userId);
 }
