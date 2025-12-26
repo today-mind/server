@@ -15,8 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-/**
- */
 @Slf4j
 @RestController
 @RequestMapping("/api/users")
@@ -93,5 +91,29 @@ public class UserController {
 
         userService.updateAiSettings(userId, request);
         return (ApiResponse<Void>) ApiResponse.success("설정이 완료되었습니다.");
+    }
+
+    /**
+     * 로그 아웃
+     */
+    @PostMapping("/me/logout")
+    public ApiResponse<Void> logout(
+            @AuthenticationPrincipal Long userId
+    ) {
+        log.info("로그아웃 요청 - UserID: {}", userId);
+        userService.logout(userId);
+        return ApiResponse.success("사용자가 로그아웃 완료", null);
+    }
+
+    /**
+     * 회원 탈퇴
+     */
+    @DeleteMapping("/me")
+    public ApiResponse<Void> delete (
+            @AuthenticationPrincipal Long userId
+    ) {
+        log.info("회원 탈퇴 요청 - UserID: {}", userId);
+        userService.delete(userId);
+        return ApiResponse.success("사용자 회원탈퇴 완료", null);
     }
 }

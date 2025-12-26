@@ -9,34 +9,31 @@ import com.example.todaymindserver.dto.response.NicknameResponseDto;
 import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.user.User;
 import com.example.todaymindserver.domain.user.UserErrorCode;
+import com.example.todaymindserver.repository.DiaryRepository;
+import com.example.todaymindserver.repository.RefreshTokenRepository;
 import com.example.todaymindserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class UserService {
 
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final DiaryRepository diaryRepository;
 
-    // 헬퍼 메서드: 닉네임 중복 체크
-    private void checkNicknameDuplication(String nickname) {
-        if (userRepository.findByNickName(nickname).isPresent()) {
-            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
-        }
-    }
-
-    /** 1. 닉네임 설정 (PUT /api/nickname) */
+    /** 1. 닉네임 설정 (PATCH /api/nickname) */
     @Transactional
     public NicknameResponseDto setupNickname(Long userId, NicknameRequestDto request) {
         // [TODO] OAuth 구현 후에는 @AuthenticationPrincipal User user를 사용해야 합니다.
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
-
-        // 닉네임 중복 체크
-        checkNicknameDuplication(request.getNickname());
 
         // 닉네임 업데이트
         user.updateNickname(request.getNickname());
@@ -83,6 +80,29 @@ public class UserService {
         // 2. 말투(Tone) 업데이트 (값이 있을 때만)
         if (request.getSpeechStyle() != null) {
             user.updateToneType(request.getSpeechStyle());
+        }
+    }
+
+    @Transactional
+    public void logout(Long userId) {
+        validateUserExists(userId);
+
+        refreshTokenRepository.deleteByUserId(userId);
+    }
+
+    @Transactional
+    public void delete(Long userId) {
+        validateUserExists(userId);
+
+        refreshTokenRepository.deleteByUserId(userId);
+        diaryRepository.deleteAllByUser_UserId(userId);
+        userRepository.deleteById(userId);
+    }
+
+    private void validateUserExists(Long userId) {
+        if(!userRepository.existsById(userId)) {
+            log.error("사용자가 존재하지 않습니다. userId={}", userId);
+            throw new BusinessException(UserErrorCode.USER_NOT_FOUND);
         }
     }
 }

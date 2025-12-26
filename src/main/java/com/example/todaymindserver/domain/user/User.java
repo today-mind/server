@@ -23,7 +23,6 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column
     private String nickName;
 
     @Column(nullable = false)
@@ -54,7 +53,6 @@ public class User {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-
     private String password;
 
     private User(String email, OauthProviderType provider, String providerUserId) {
