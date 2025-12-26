@@ -12,4 +12,5 @@ public class ProfileResponseDto {
     private final String email;
     private final MbtiType mbtiType;
     private final ToneType toneType;
+    private boolean isAppLockEnabled;
 }

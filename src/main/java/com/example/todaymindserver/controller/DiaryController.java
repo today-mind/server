@@ -76,7 +76,7 @@ public class DiaryController {
      * 감정 통계 리포트 조회
      * GET /api/diaries/report?year=2025&month=12
      */
-    @GetMapping("/report")
+    @GetMapping("/diaries/report")
     public ApiResponse<EmotionReportResponseDto> getEmotionReport(
             @AuthenticationPrincipal Long userId,
             @RequestParam int year,
