@@ -86,7 +86,4 @@ public class User {
             this.toneType = toneType;
         }
     }
-
-    public void updateAiSettings(MbtiType finalMbti, ToneType finalTone) {
-    }
 }
