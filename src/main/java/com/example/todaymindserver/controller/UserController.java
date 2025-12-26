@@ -78,7 +78,7 @@ public class UserController {
     /**
      * 로그 아웃
      */
-    @PostMapping("/users/me/logout")
+    @PostMapping("/me/logout")
     public ApiResponse<Void> logout(
         @AuthenticationPrincipal Long userId
     ) {
@@ -89,7 +89,7 @@ public class UserController {
     /**
      * 회원 탈퇴
      */
-    @DeleteMapping("/users/me")
+    @DeleteMapping("/me")
     public ApiResponse<Void> delete (
         @AuthenticationPrincipal Long userId
     ) {
