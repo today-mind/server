@@ -2,6 +2,7 @@ package com.example.todaymindserver.controller;
 
 import com.example.todaymindserver.common.response.ApiResponse;
 import com.example.todaymindserver.common.response.dto.ProfileResponseDto;
+import com.example.todaymindserver.dto.request.AiSettingsRequestDto;
 import com.example.todaymindserver.dto.request.AppLockRequestDto;
 import com.example.todaymindserver.dto.request.NicknameRequestDto;
 import com.example.todaymindserver.dto.response.NicknameResponseDto;
@@ -76,11 +77,28 @@ public class UserController {
     }
 
     /**
+     * [Branch 5] AI 답장 설정 변경
+     * 명세서 주소: PATCH /api/users/ai-setting
+     * 명세서 응답 메시지: "설정이 완료되었습니다."
+     */
+    @PatchMapping("/ai-setting")
+    public ApiResponse<Void> updateAiSettings(
+            @AuthenticationPrincipal Long userId,
+            @RequestBody @Valid AiSettingsRequestDto request) {
+
+        log.info("AI 설정 변경 요청 - UserID: {}, Personality: {}, Speech: {}",
+                userId, request.getPersonalityType(), request.getSpeechStyle());
+
+        userService.updateAiSettings(userId, request);
+        return (ApiResponse<Void>) ApiResponse.success("설정이 완료되었습니다.");
+    }
+
+    /**
      * 로그 아웃
      */
     @PostMapping("/me/logout")
     public ApiResponse<Void> logout(
-        @AuthenticationPrincipal Long userId
+            @AuthenticationPrincipal Long userId
     ) {
         userService.logout(userId);
         return ApiResponse.success("사용자가 로그아웃 완료", null);
@@ -91,7 +109,7 @@ public class UserController {
      */
     @DeleteMapping("/me")
     public ApiResponse<Void> delete (
-        @AuthenticationPrincipal Long userId
+            @AuthenticationPrincipal Long userId
     ) {
         userService.delete(userId);
         return ApiResponse.success("사용자 회원탈퇴 완료", null);

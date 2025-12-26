@@ -1,7 +1,6 @@
 package com.example.todaymindserver.domain.user;
 
 import com.example.todaymindserver.domain.oauth.OauthProviderType;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class User{
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +25,7 @@ public class User{
 
     private String nickName;
 
+    @Column(nullable = false)
     private String email;
 
     @Enumerated(EnumType.STRING)
@@ -34,7 +34,6 @@ public class User{
     @Column(nullable = false, unique = true)
     private String providerUserId;
 
-    // AI 페르소나 설정 (MyPage API 담당)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MbtiType mbtiType = MbtiType.T;
@@ -43,12 +42,10 @@ public class User{
     @Column(nullable = false)
     private ToneType toneType = ToneType.HONORIFIC;
 
-    // 3. 회원 상태 (MyPage API 담당)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserStatus status = UserStatus.ACTIVE;
 
-    // 4. Auditing
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -58,34 +55,33 @@ public class User{
     private LocalDateTime updatedAt;
     private String password;
 
-    // OAuth용 생성자 (김용준 님 코드)
     private User(String email, OauthProviderType provider, String providerUserId) {
         this.email = email;
         this.provider = provider;
         this.providerUserId = providerUserId;
     }
 
-    public static User create (String email, OauthProviderType provider, String providerUserId) {
-        return new User(
-                email,
-                provider,
-                providerUserId
-        );
+    public static User create(String email, OauthProviderType provider, String providerUserId) {
+        return new User(email, provider, providerUserId);
     }
 
-    // 닉네임 설정을 위한 메서드
     public void updateNickname(String nickname) {
         this.nickName = nickname;
     }
 
-    // 앱 잠금 비밀번호 설정을 위한 메서드
     public void updatePassword(String password) {
         this.password = password;
     }
 
-    // AI 설정 변경을 위한 메서드
-    public void updateAiSettings(MbtiType mbtiType, ToneType toneType) {
-        this.mbtiType = mbtiType;
-        this.toneType = toneType;
+    public void updateMbtiType(MbtiType mbtiType) {
+        if (mbtiType != null) {
+            this.mbtiType = mbtiType;
+        }
+    }
+
+    public void updateToneType(ToneType toneType) {
+        if (toneType != null) {
+            this.toneType = toneType;
+        }
     }
 }
