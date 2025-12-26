@@ -85,4 +85,15 @@ public class UserController {
         userService.logout(userId);
         return ApiResponse.success("사용자가 로그아웃 완료", null);
     }
+
+    /**
+     * 회원 탈퇴
+     */
+    @DeleteMapping("/users/me")
+    public ApiResponse<Void> delete (
+        @AuthenticationPrincipal Long userId
+    ) {
+        userService.delete(userId);
+        return ApiResponse.success("사용자 회원탈퇴 완료", null);
+    }
 }

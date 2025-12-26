@@ -24,8 +24,7 @@ public class User{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column
-    private String nickName; // Unique 제거된 상태
+    private String nickName;
 
     private String email;
 
