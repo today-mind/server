@@ -100,7 +100,6 @@ public class UserController {
     public ApiResponse<Void> logout(
             @AuthenticationPrincipal Long userId
     ) {
-        log.info("로그아웃 요청 - UserID: {}", userId);
         userService.logout(userId);
         return ApiResponse.success("사용자가 로그아웃 완료", null);
     }
@@ -112,7 +111,6 @@ public class UserController {
     public ApiResponse<Void> delete (
             @AuthenticationPrincipal Long userId
     ) {
-        log.info("회원 탈퇴 요청 - UserID: {}", userId);
         userService.delete(userId);
         return ApiResponse.success("사용자 회원탈퇴 완료", null);
     }
