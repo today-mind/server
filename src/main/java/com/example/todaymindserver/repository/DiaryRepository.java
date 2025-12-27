@@ -44,4 +44,10 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
     );
 
     void deleteAllByUser_UserId(Long userUserId);
+
+    boolean existsByUserAndCreatedAtBetween(
+        User user,
+        LocalDateTime start,
+        LocalDateTime end
+    );
 }
