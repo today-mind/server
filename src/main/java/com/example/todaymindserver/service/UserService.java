@@ -56,6 +56,7 @@ public class UserService {
                 .email(user.getEmail())
                 .mbtiType(user.getMbtiType())
                 .toneType(user.getToneType())
+                .isAppLockEnabled(user.getPassword() != null)
                 .build();
     }
 

@@ -42,33 +42,33 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
 
         return httpSecurity
-            .csrf(AbstractHttpConfigurer::disable)
-            .cors(cors -> cors.configurationSource(corsConfigurationSource))
-            .httpBasic(AbstractHttpConfigurer::disable)
-            .formLogin(AbstractHttpConfigurer::disable)
-            .logout(AbstractHttpConfigurer::disable)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/actuator/health").permitAll()
-                .requestMatchers(HttpMethod.POST,
-                    "/oauth/**",
-                    "/auth/token/refresh"
-                ).permitAll()
-                .requestMatchers("/api/diaries/**").hasRole(Role.USER.name())
-                .requestMatchers("/api/users/**").hasRole(Role.USER.name())
-                .requestMatchers("/api/**").authenticated()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/oauth/**",
+                                "/auth/token/refresh"
+                        ).permitAll()
+                        .requestMatchers("/api/diaries/**").hasRole(Role.USER.name())
+                        .requestMatchers("/api/users/**").hasRole(Role.USER.name())
+                        .requestMatchers("/api/**").authenticated()
 
-                .anyRequest().denyAll()
-            )
+                        .anyRequest().denyAll()
+                )
 
-            .addFilterBefore(new JwtFilter(jwtAuthenticationService, jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(jwtAuthenticationService, jwtUtil), UsernamePasswordAuthenticationFilter.class)
 
-            .exceptionHandling(configurer ->
-                configurer
-                    .authenticationEntryPoint(authenticationEntryPoint)
-                    .accessDeniedHandler(accessDeniedHandler)
-            )
-            .build();
+                .exceptionHandling(configurer ->
+                        configurer
+                                .authenticationEntryPoint(authenticationEntryPoint)
+                                .accessDeniedHandler(accessDeniedHandler)
+                )
+                .build();
     }
 }
