@@ -90,7 +90,7 @@ public class UserController {
                 userId, request.getPersonalityType(), request.getSpeechStyle());
 
         userService.updateAiSettings(userId, request);
-        return (ApiResponse<Void>) ApiResponse.success("설정이 완료되었습니다.");
+        return ApiResponse.success("설정이 완료되었습니다.",null);
     }
 
     /**
