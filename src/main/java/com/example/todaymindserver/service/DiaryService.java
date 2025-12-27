@@ -38,6 +38,7 @@ public class DiaryService {
 
     private final DiaryRepository diaryRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final ApplicationEventPublisher applicationEventPublisher;
     // private final AiService aiService; // 1번 PR 리뷰 반영 전이므로 일단 주석 처리 유지
 
@@ -55,6 +56,17 @@ public class DiaryService {
         // 1. User 엔티티 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+
+        userService.validateDiaryWritableUser(user);
+
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = today.plusDays(1).atStartOfDay();
+
+        if(diaryRepository.existsByUserAndCreatedAtBetween(user, start, end)) {
+            log.warn("일기는 하루에 한 번만 작성할 수 있습니다. userId={}", userId);
+            throw new BusinessException(DiaryErrorCode.DIARY_ALREADY_EXISTS_TODAY);
+        }
 
         // 2. Diary 엔티티 생성 및 저장
         Diary diary = Diary.create(
