@@ -9,7 +9,8 @@ import lombok.Getter;
 @Builder
 public class ProfileResponseDto {
     private final String nickname;
+    private final String email;
     private final MbtiType mbtiType;
     private final ToneType toneType;
-    // ... 필요한 다른 프로필 정보 추가
+    private boolean isAppLockEnabled;
 }
