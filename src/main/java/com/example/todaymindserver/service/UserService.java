@@ -1,8 +1,6 @@
 package com.example.todaymindserver.service;
 
 import com.example.todaymindserver.common.response.dto.ProfileResponseDto;
-import com.example.todaymindserver.domain.user.MbtiType;
-import com.example.todaymindserver.domain.user.ToneType;
 import com.example.todaymindserver.dto.request.AiSettingsRequestDto;
 import com.example.todaymindserver.dto.request.NicknameRequestDto;
 import com.example.todaymindserver.dto.response.NicknameResponseDto;
@@ -104,6 +102,13 @@ public class UserService {
         if(!userRepository.existsById(userId)) {
             log.error("사용자가 존재하지 않습니다. userId={}", userId);
             throw new BusinessException(UserErrorCode.USER_NOT_FOUND);
+        }
+    }
+
+    public void validateDiaryWritableUser(User user) {
+        if (user.getNickName() == null) {
+            log.error("사용자의 닉네임이 존재하지 않습니다. userId={}", user.getUserId());
+            throw new BusinessException(UserErrorCode.NICKNAME_REQUIRED);
         }
     }
 }
