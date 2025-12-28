@@ -1,17 +1,18 @@
 package com.example.todaymindserver.service;
 
 import com.example.todaymindserver.domain.BusinessException;
+import com.example.todaymindserver.domain.user.AppLockErrorCode;
 import com.example.todaymindserver.domain.user.User;
 import com.example.todaymindserver.domain.user.UserErrorCode;
-import com.example.todaymindserver.domain.user.AppLockErrorCode;
 import com.example.todaymindserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 /**
- * [Branch 4 최종] 앱 잠금 서비스
+ * 앱 잠금 설정 및 인증 서비스 (Production Ready)
  */
 @Service
 @RequiredArgsConstructor
@@ -20,12 +21,21 @@ public class AppLockService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * 앱 잠금 설정 및 해제
+     */
     @Transactional
     public void setAppLock(Long userId, String password) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        // 비밀번호 암호화 저장
+        // password가 빈 문자열("") 혹은 공백으로 오면 잠금 해제(null 처리)로 판단합니다.
+        if (!StringUtils.hasText(password)) {
+            user.updatePassword(null);
+            return;
+        }
+
+        // 유효한 4자리 숫자가 들어온 경우에만 암호화하여 저장합니다.
         user.updatePassword(passwordEncoder.encode(password));
     }
 
@@ -34,12 +44,10 @@ public class AppLockService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        // 2. 앱 잠금 전용 에러(설정 안 됨) 사용
         if (user.getPassword() == null) {
             throw new BusinessException(AppLockErrorCode.APP_LOCK_NOT_SET);
         }
 
-        // 3. 앱 잠금 전용 에러(비밀번호 불일치) 사용
         if (!passwordEncoder.matches(inputPassword, user.getPassword())) {
             throw new BusinessException(AppLockErrorCode.INVALID_APP_PASSWORD);
         }
