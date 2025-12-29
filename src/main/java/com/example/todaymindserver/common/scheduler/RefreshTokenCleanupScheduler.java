@@ -18,13 +18,16 @@ public class RefreshTokenCleanupScheduler {
     /**
      * 매일 새벽 3시 만료 RefreshToken 정리
      */
-    @Scheduled(cron = "0 10 18 * * *")
+    @Scheduled(cron = "${scheduler.refresh-token.cleanup.cron}")
     public void cleanupExpiredRefreshTokens() {
         try {
-            log.info("RefreshToken 만료 정리 스케줄 시작");
+            log.info("[Scheduler][RefreshTokenCleanup] 시작");
             refreshTokenService.deleteExpiredRefreshTokens();
         } catch (Exception e) {
-            log.error("RefreshToken 만료 정리 스케줄 실패", e);
+            log.error(
+                "[Scheduler][RefreshTokenCleanup] 비재시도 예외 발생",
+                e
+            );
         }
     }
 }

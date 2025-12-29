@@ -20,14 +20,6 @@ logging:
     org.hibernate.sql: off
     org.hibernate.type.descriptor.sql: off
 
-  file:
-    name: logs/today-mind.log
-
-  logback:
-    rollingpolicy:
-      max-file-size: 100MB
-      max-history: 14
-
 oauth:
   kakao:
     user-info-url: https://kapi.kakao.com/v2/user/me
@@ -44,6 +36,11 @@ jwt:
 clova:
   completion-url: ${CLOVA_COMPLETION_URL}
   api-key: ${CLOVA_API_KEY}
+
+scheduler:
+  refresh-token:
+    cleanup:
+      cron: "0 0 3 * * *"
 
 management:
   endpoints:
