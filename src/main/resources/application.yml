@@ -37,6 +37,10 @@ clova:
   completion-url: ${CLOVA_COMPLETION_URL}
   api-key: ${CLOVA_API_KEY}
 
+slack:
+  webhook:
+    url: ${SLACK_WEBHOOK_URL}
+
 scheduler:
   refresh-token:
     cleanup:

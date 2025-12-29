@@ -117,5 +117,17 @@ public class RefreshTokenService {
             e.getMessage(),
             e
         );
+
+        slackNotifierClient.sendNotification("""
+        [Refresh token 정리 스케줄 실패]
+        • 작업: RefreshTokenCleanup
+        • 재시도: 1회 후 실패
+        • 원인: %s
+        • 시각: %s
+        """.formatted(
+                e.getMessage(),
+                LocalDateTime.now()
+            )
+        );
     }
 }
