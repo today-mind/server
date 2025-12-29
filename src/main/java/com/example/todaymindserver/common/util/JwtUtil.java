@@ -5,6 +5,9 @@ import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.example.todaymindserver.domain.BusinessException;
+import com.example.todaymindserver.domain.token.TokenErrorCode;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -23,7 +26,8 @@ public class JwtUtil {
             return tokenValue.substring(BEARER_PREFIX.length()); // "Bearer " 제거 후 반환
         }
 
-        throw new IllegalArgumentException("유효하지 않은 JWT 토큰입니다.");
+        log.warn("토큰이 type이 Bearer가 아닙니다.");
+        throw new BusinessException(TokenErrorCode.INVALID_ACCESS_TOKEN);
     }
 }
 

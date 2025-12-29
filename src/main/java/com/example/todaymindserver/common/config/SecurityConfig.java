@@ -13,8 +13,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import com.example.todaymindserver.common.util.CustomAccessDeniedHandler;
-import com.example.todaymindserver.common.util.CustomAuthenticationEntryPoint;
+import com.example.todaymindserver.common.security.CustomAccessDeniedHandler;
+import com.example.todaymindserver.common.security.CustomAuthenticationEntryPoint;
 import com.example.todaymindserver.common.util.JwtFilter;
 import com.example.todaymindserver.common.util.JwtUtil;
 import com.example.todaymindserver.common.util.Role;

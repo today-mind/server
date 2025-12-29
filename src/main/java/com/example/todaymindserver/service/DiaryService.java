@@ -10,10 +10,8 @@ import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.diary.Diary;
 import com.example.todaymindserver.domain.diary.DiaryErrorCode;
 import com.example.todaymindserver.domain.user.User;
-import com.example.todaymindserver.domain.user.UserErrorCode;
 import com.example.todaymindserver.dto.response.EmotionReportResponseDto;
 import com.example.todaymindserver.repository.DiaryRepository;
-import com.example.todaymindserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,10 +35,8 @@ import java.util.stream.Collectors;
 public class DiaryService {
 
     private final DiaryRepository diaryRepository;
-    private final UserRepository userRepository;
     private final UserService userService;
     private final ApplicationEventPublisher applicationEventPublisher;
-    // private final AiService aiService; // 1번 PR 리뷰 반영 전이므로 일단 주석 처리 유지
 
     /**
      * 일기 작성 처리 및 AI 답장 생성 트리거 (기존 1번 기능)
@@ -54,10 +50,9 @@ public class DiaryService {
     public DiaryResponseDto createDiary(Long userId, DiaryRequestDto request) {
 
         // 1. User 엔티티 조회
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+        User user = userService.getUser(userId);
 
-        userService.validateDiaryWritableUser(user);
+        user.validateUserNickNameExists();
 
         LocalDate today = LocalDate.now();
         LocalDateTime start = today.atStartOfDay();
@@ -76,12 +71,13 @@ public class DiaryService {
         );
         diaryRepository.save(diary);
 
-        // 3. [TODO] AI 엔진으로 일기 내용 전송 (비동기 트리거)
+        // 3. Ai 응답 이벤트 발행
         applicationEventPublisher.publishEvent(
             new EmpatheticResponseEvent(
                 diary.getDiaryId(),
                 diary.getContent(),
                 diary.getEmotionType(),
+                user.getUserId(),
                 user.getNickName(),
                 user.getMbtiType(),
                 user.getToneType()
@@ -93,7 +89,6 @@ public class DiaryService {
                 .build();
     }
 
-    // --- 3번 기능 구현 ---
 
     /**
      * 일기 월별 캘린더 모아보기
@@ -114,8 +109,7 @@ public class DiaryService {
         LocalDateTime endOfMonth = endDate.atTime(23, 59, 59);
 
         // 2. User 엔티티 조회
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new BusinessException(DiaryErrorCode.DIARY_NOT_FOUND));
+        User user = userService.getUser(userId);
 
         // 3. DB에서 해당 월의 일기 목록 조회 (특정 사용자의 일기만)
         List<Diary> diaries = diaryRepository.findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(
@@ -146,16 +140,15 @@ public class DiaryService {
     public DiaryDetailResponseDto getDiaryDetail(Long userId, Long diaryId) {
 
         // 1. Diary 조회 및 권한 검증 (해당 일기가 이 유저의 것인지 확인)
-        Diary foundDiary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new BusinessException(DiaryErrorCode.DIARY_NOT_FOUND));
+        Diary diary = getDiary(userId, diaryId);
 
-        if (!foundDiary.getUser().getUserId().equals(userId)) {
-            // 여기에 CustomAccessDeniedException 같은 권한 예외를 던져야 합니다.
-            throw new IllegalArgumentException("해당 일기에 접근할 권한이 없습니다.");
+        if (!diary.getUser().getUserId().equals(userId)) {
+            log.warn("일기 접근 권한이 없습니다. userId={}, diary_userId={}", userId, diary.getUser().getUserId());
+            throw new BusinessException(DiaryErrorCode.DIARY_ACCESS_DENIED);
         }
 
         // 3. DTO 반환
-        return DiaryDetailResponseDto.from(foundDiary);
+        return DiaryDetailResponseDto.from(diary);
     }
 
     /**
@@ -167,8 +160,7 @@ public class DiaryService {
      */
     public EmotionReportResponseDto getEmotionReport(Long userId, int year, int month) {
         // 1. 유저 조회 (없으면 예외 발생)
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+        User user = userService.getUser(userId);
 
         // 2. 해당 월의 시작일 (예: 12월 1일 00:00:00)
         LocalDateTime startOfMonth = LocalDateTime.of(year, month, 1, 0, 0);
@@ -193,5 +185,40 @@ public class DiaryService {
                 .totalCount(diaries.size())
                 .emotionCounts(emotionCounts)
                 .build();
+    }
+
+    public Diary getDiary(Long userId, Long diaryId) {
+        return diaryRepository.findById(diaryId)
+            .orElseThrow(() -> {
+                log.warn("일기가 존재하지 않습니다. userId={}, diaryId={}", userId, diaryId);
+                return new BusinessException(DiaryErrorCode.DIARY_NOT_FOUND);
+            });
+
+    }
+
+    @Transactional(readOnly = true)
+    public void getAiResponse(Long userId, Long diaryId) {
+        User user = userService.getUser(userId);
+
+        Diary diary = diaryRepository.findById(diaryId)
+            .orElseThrow(() -> {
+                log.warn("일기를 찾을 수 없습니다. userId={}, diaryId={}", userId, diaryId);
+                return new BusinessException(DiaryErrorCode.DIARY_NOT_FOUND);
+            });
+
+        diary.validateRetryAllowed();
+
+        // 3. Ai 응답 이벤트 발행
+        applicationEventPublisher.publishEvent(
+            new EmpatheticResponseEvent(
+                diary.getDiaryId(),
+                diary.getContent(),
+                diary.getEmotionType(),
+                user.getUserId(),
+                user.getNickName(),
+                user.getMbtiType(),
+                user.getToneType()
+            )
+        );
     }
 }

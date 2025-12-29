@@ -27,7 +27,7 @@ public class JwtAuthenticationService {
 
         String type = jwtProvider.extractTokenType(claims);
         if (!jwtProvider.getAccessTokenTypeValue().equals(type)) {
-            log.error("Access token type이 아닙니다.");
+            log.warn("Access token이 아닙니다.");
             throw new BusinessException(TokenErrorCode.INVALID_ACCESS_TOKEN);
         }
 

@@ -1,4 +1,4 @@
-package com.example.todaymindserver.common.util;
+package com.example.todaymindserver.common.security;
 
 import java.io.IOException;
 
@@ -33,19 +33,19 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         // 2) jjwt 관련 예외 매핑
         if (cause instanceof SecurityException) {
-            log.error("Access Token이 잘못된 key로 서명 검증을 시도하였습니다: {}", cause.getMessage());
+            log.warn("Access Token이 잘못된 key로 서명 검증을 시도하였습니다: {}", cause.getMessage());
             return SecurityServletErrorCode.INVALID_JWT_SIGNATURE;
         } else if (cause instanceof MalformedJwtException) {
-            log.error("Access Token이 JWT 구조를 만족하지 않습니다: {}", cause.getMessage());
+            log.warn("Access Token이 JWT 구조를 만족하지 않습니다: {}", cause.getMessage());
             return SecurityServletErrorCode.INVALID_JWT_FORMAT;
         } else if (cause instanceof ExpiredJwtException) {
             log.warn("Access Token이 만료되었습니다: {}", cause.getMessage());
             return SecurityServletErrorCode.EXPIRED_JWT_TOKEN;
         } else if (cause instanceof UnsupportedJwtException) {
-            log.error("서버에서 지원하지 않은 방식으로 서명된 JWT 토큰입니다.: {}", cause.getMessage());
+            log.warn("서버에서 지원하지 않은 방식으로 서명된 JWT 토큰입니다.: {}", cause.getMessage());
             return SecurityServletErrorCode.UNSUPPORTED_JWT;
         } else {
-            log.error("Access Token 인증 과정 중 알 수 없는 서버 오류: {}", cause.getMessage(), cause);
+            log.warn("Access Token 인증 과정 중 알 수 없는 서버 오류: {}", cause.getMessage(), cause);
             return SecurityServletErrorCode.INTERNAL_SERVER_ERROR;
         }
     }
