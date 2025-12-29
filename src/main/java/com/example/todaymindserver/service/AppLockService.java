@@ -1,7 +1,6 @@
 package com.example.todaymindserver.service;
 
 import com.example.todaymindserver.domain.BusinessException;
-import com.example.todaymindserver.domain.user.AppLockErrorCode;
 import com.example.todaymindserver.domain.user.User;
 import com.example.todaymindserver.domain.app_lock.AppLockErrorCode;
 
