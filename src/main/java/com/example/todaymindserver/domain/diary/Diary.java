@@ -69,6 +69,12 @@ public class Diary extends BaseTime { // <--- BaseTimeEntity 상속 추가
         return new Diary(user, content, emotionType);
     }
 
+    public void validateOwner(Long userId) {
+        if (!this.user.getUserId().equals(userId)) {
+            throw new BusinessException(DiaryErrorCode.DIARY_ACCESS_DENIED);
+        }
+    }
+
     public void validateRetryAllowed() {
         if (this.responseStatus != ResponseStatusType.FAILED) {
             throw new BusinessException(DiaryErrorCode.INVALID_RESPONSE_STATUS_TRANSITION);

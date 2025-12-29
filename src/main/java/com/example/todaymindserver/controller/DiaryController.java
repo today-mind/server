@@ -30,13 +30,23 @@ public class DiaryController {
     @PostMapping("/diaries")
     public ApiResponse<DiaryResponseDto> createDiary(
             @AuthenticationPrincipal Long userId,
-            @RequestBody @Valid DiaryRequestDto request) {
+            @RequestBody @Valid DiaryRequestDto request
+    ) {
 
         DiaryResponseDto response = diaryService.createDiary(userId, request);
         return ApiResponse.success("일기 작성이 완료되었습니다.", response, HttpStatus.CREATED);
     }
 
-    // --- 3번 기능 구현 ---
+    // 2. 일기 삭제 API
+    @DeleteMapping("/diaries/{diaryId}")
+    public ApiResponse<Void> deleteDiary(
+        @AuthenticationPrincipal Long userId,
+        @PathVariable Long diaryId
+    ) {
+
+        diaryService.deleteDiary(userId, diaryId);
+        return ApiResponse.success("일기 삭제가 완료되었습니다.", null);
+    }
 
     /**
      * 일기 월별 캘린더 모아보기 API

@@ -142,10 +142,8 @@ public class DiaryService {
         // 1. Diary 조회 및 권한 검증 (해당 일기가 이 유저의 것인지 확인)
         Diary diary = getDiary(userId, diaryId);
 
-        if (!diary.getUser().getUserId().equals(userId)) {
-            log.warn("일기 접근 권한이 없습니다. userId={}, diary_userId={}", userId, diary.getUser().getUserId());
-            throw new BusinessException(DiaryErrorCode.DIARY_ACCESS_DENIED);
-        }
+        // 2. 본인 일기 검증
+        diary.validateOwner(userId);
 
         // 3. DTO 반환
         return DiaryDetailResponseDto.from(diary);
@@ -220,5 +218,20 @@ public class DiaryService {
                 user.getToneType()
             )
         );
+    }
+
+    @Transactional
+    public void deleteDiary(Long userId, Long diaryId) {
+        // 1. User 엔티티 조회
+        userService.getUser(userId);
+
+        // 2. 일기 조회
+        Diary diary = getDiary(userId, diaryId);
+
+        // 3. 본인 일기 검증
+        diary.validateOwner(userId);
+
+        // 4. 일기 삭제
+        diaryRepository.delete(diary);
     }
 }
