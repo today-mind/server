@@ -12,7 +12,7 @@ import com.example.todaymindserver.common.client.clova.prompt.PromptBuilder;
 import com.example.todaymindserver.common.client.dto.ClovaResponse;
 import com.example.todaymindserver.common.event.dto.EmpatheticResponseEvent;
 import com.example.todaymindserver.dto.Message;
-import com.example.todaymindserver.service.ClovaService;
+import com.example.todaymindserver.service.AiService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ClovaResponseEventListner {
+public class AiResponseEventListener {
 
-    private final ClovaService clovaService;
+    private final AiService aiService;
     private final ClovaClient clovaClient;
     private final PromptBuilder promptBuilder;
 
@@ -39,6 +39,10 @@ public class ClovaResponseEventListner {
         );
         ClovaResponse response = clovaClient.getClovaAnswer(messages);
 
-        clovaService.saveClovaResponse(event.diaryId(), response);
+        aiService.saveAiResponse(
+            event.userId(),
+            event.diaryId(),
+            response
+        );
     }
 }
