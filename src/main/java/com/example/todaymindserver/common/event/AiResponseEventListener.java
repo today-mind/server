@@ -7,12 +7,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import com.example.todaymindserver.common.client.clova.ClovaClient;
-import com.example.todaymindserver.common.client.clova.prompt.PromptBuilder;
+import com.example.todaymindserver.common.client.ai.AiClient;
+import com.example.todaymindserver.common.client.ai.prompt.PromptBuilder;
 import com.example.todaymindserver.common.client.dto.ClovaResponse;
 import com.example.todaymindserver.common.event.dto.EmpatheticResponseEvent;
 import com.example.todaymindserver.dto.Message;
-import com.example.todaymindserver.service.ClovaService;
+import com.example.todaymindserver.service.AiService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ClovaResponseEventListner {
+public class AiResponseEventListener {
 
-    private final ClovaService clovaService;
-    private final ClovaClient clovaClient;
+    private final AiService aiService;
+    private final AiClient aiClient;
     private final PromptBuilder promptBuilder;
 
     @Async
@@ -37,8 +37,12 @@ public class ClovaResponseEventListner {
             event.mbtiType(),
             event.toneType()
         );
-        ClovaResponse response = clovaClient.getClovaAnswer(messages);
+        ClovaResponse response = aiClient.getAiResponse(messages);
 
-        clovaService.saveClovaResponse(event.diaryId(), response);
+        aiService.saveAiResponse(
+            event.userId(),
+            event.diaryId(),
+            response
+        );
     }
 }

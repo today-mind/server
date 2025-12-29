@@ -57,7 +57,6 @@ public class UserController {
             @AuthenticationPrincipal Long userId,
             @RequestBody @Valid AppLockRequestDto request) {
 
-        log.info("앱 잠금 설정 시도 - UserID: {}", userId);
         appLockService.setAppLock(userId, request.getPassword());
         return ResponseEntity.ok(ApiResponse.success("앱 잠금 설정이 완료되었습니다.", null));
     }
@@ -70,7 +69,6 @@ public class UserController {
             @AuthenticationPrincipal Long userId,
             @RequestBody @Valid AppLockRequestDto request) {
 
-        log.info("앱 잠금 인증 요청 - UserID: {}", userId); // ✅ 변수 누락 해결
         appLockService.verifyAppLock(userId, request.getPassword());
 
         return ResponseEntity.ok(ApiResponse.success("비밀번호 인증에 성공했습니다.", null));
@@ -85,9 +83,6 @@ public class UserController {
     public ApiResponse<Void> updateAiSettings(
             @AuthenticationPrincipal Long userId,
             @RequestBody @Valid AiSettingsRequestDto request) {
-
-        log.info("AI 설정 변경 요청 - UserID: {}, Personality: {}, Speech: {}",
-                userId, request.getPersonalityType(), request.getSpeechStyle());
 
         userService.updateAiSettings(userId, request);
         return ApiResponse.success("설정이 완료되었습니다.",null);

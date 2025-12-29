@@ -1,4 +1,4 @@
-package com.example.todaymindserver.common.client.clova.prompt;
+package com.example.todaymindserver.common.client.ai.prompt;
 
 import java.util.ArrayList;
 import java.util.List;

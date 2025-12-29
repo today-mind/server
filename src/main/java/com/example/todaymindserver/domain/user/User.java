@@ -1,23 +1,26 @@
 package com.example.todaymindserver.domain.user;
 
+import com.example.todaymindserver.domain.BaseTime;
+import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.oauth.OauthProviderType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class User {
+public class User extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -82,6 +85,13 @@ public class User {
     public void updateToneType(ToneType toneType) {
         if (toneType != null) {
             this.toneType = toneType;
+        }
+    }
+
+    public void validateUserNickNameExists() {
+        if (getNickName() == null) {
+            log.error("사용자의 닉네임이 존재하지 않습니다. userId={}", getUserId());
+            throw new BusinessException(UserErrorCode.NICKNAME_REQUIRED);
         }
     }
 }

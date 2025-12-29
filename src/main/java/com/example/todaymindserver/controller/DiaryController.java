@@ -86,4 +86,14 @@ public class DiaryController {
 
         return ApiResponse.success("감정 리포트 조회 완료", report);
     }
+
+    @PostMapping("/diaries/{diaryId}/ai-response")
+    public ApiResponse<Void> getAiResponse(
+        @AuthenticationPrincipal Long userId,
+        @PathVariable("diaryId") Long diaryId
+    ) {
+        diaryService.getAiResponse(userId, diaryId);
+
+        return ApiResponse.success("AI 응답 요청 접수 완료", null, HttpStatus.ACCEPTED);
+    }
 }
