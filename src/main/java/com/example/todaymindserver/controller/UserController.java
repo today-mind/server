@@ -9,10 +9,11 @@ import com.example.todaymindserver.dto.response.NicknameResponseDto;
 import com.example.todaymindserver.service.AppLockService;
 import com.example.todaymindserver.service.UserService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -52,13 +53,19 @@ public class UserController {
     /**
      * 3. 앱 잠금 비밀번호 설정 (PATCH /api/users/lock-setting/set)
      */
-    @PatchMapping ("/lock-setting/set")
+    @PatchMapping("/lock-setting/set")
     public ResponseEntity<ApiResponse<Void>> setAppLock(
             @AuthenticationPrincipal Long userId,
-            @RequestBody @Valid AppLockRequestDto request) {
+            @RequestBody @Valid AppLockRequestDto request
+    ) {
 
         appLockService.setAppLock(userId, request.getPassword());
-        return ResponseEntity.ok(ApiResponse.success("앱 잠금 설정이 완료되었습니다.", null));
+
+        String successMessage = StringUtils.hasText(request.getPassword())
+                ? "앱 잠금 설정이 완료되었습니다."
+                : "앱 잠금이 해제되었습니다.";
+
+        return ResponseEntity.ok(ApiResponse.success(successMessage, null));
     }
 
     /**
