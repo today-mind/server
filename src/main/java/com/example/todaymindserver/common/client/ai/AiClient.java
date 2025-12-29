@@ -1,4 +1,4 @@
-package com.example.todaymindserver.common.client.clova;
+package com.example.todaymindserver.common.client.ai;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class ClovaClient {
+public class AiClient {
 
     private final RestClient restClient = RestClient.create();
 

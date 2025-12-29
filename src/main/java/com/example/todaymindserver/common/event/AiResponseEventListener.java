@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import com.example.todaymindserver.common.client.clova.ClovaClient;
-import com.example.todaymindserver.common.client.clova.prompt.PromptBuilder;
+import com.example.todaymindserver.common.client.ai.AiClient;
+import com.example.todaymindserver.common.client.ai.prompt.PromptBuilder;
 import com.example.todaymindserver.common.client.dto.ClovaResponse;
 import com.example.todaymindserver.common.event.dto.EmpatheticResponseEvent;
 import com.example.todaymindserver.dto.Message;
@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AiResponseEventListener {
 
     private final AiService aiService;
-    private final ClovaClient clovaClient;
+    private final AiClient aiClient;
     private final PromptBuilder promptBuilder;
 
     @Async
@@ -37,7 +37,7 @@ public class AiResponseEventListener {
             event.mbtiType(),
             event.toneType()
         );
-        ClovaResponse response = clovaClient.getClovaAnswer(messages);
+        ClovaResponse response = aiClient.getClovaAnswer(messages);
 
         aiService.saveAiResponse(
             event.userId(),
