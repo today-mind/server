@@ -1,14 +1,14 @@
 package com.example.todaymindserver.domain.token;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,13 +20,16 @@ public class RefreshToken {
     @Column(nullable = false, length = 500)
     private String token;
 
-    private RefreshToken(Long userId, String token) {
+    private LocalDateTime expiresAt;
+
+    private RefreshToken(Long userId, String token, LocalDateTime expiresAt) {
         this.userId = userId;
         this.token = token;
+        this.expiresAt = expiresAt;
     }
 
-    public static RefreshToken create(Long userId, String token) {
-        return new RefreshToken(userId, token);
+    public static RefreshToken create(Long userId, String token, LocalDateTime expiresAt) {
+        return new RefreshToken(userId, token, expiresAt);
     }
 
     public void updateToken(String token) {

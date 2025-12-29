@@ -57,12 +57,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         AuthenticationException authException
     ) throws IOException {
 
-        log.debug("AuthenticationEntryPoint 진입: method={}, uri={}, exception={}",
-            request.getMethod(),
-            request.getRequestURI(),
-            authException.getClass().getSimpleName()
-        );
-
         SecurityServletErrorCode errorCode = resolveErrorCode(authException);
 
         SecurityResponseWriter.writeJsonErrorResponse(response, errorCode);

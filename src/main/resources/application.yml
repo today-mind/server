@@ -9,9 +9,24 @@ spring:
     password: ${DB_PASSWORD}
 
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: create
+
+logging:
+  level:
+    root: info
+    com.example.todaymindserver: info
+    org.hibernate.sql: off
+    org.hibernate.type.descriptor.sql: off
+
+  file:
+    name: logs/today-mind.log
+
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 14
 
 oauth:
   kakao:
