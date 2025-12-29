@@ -1,5 +1,7 @@
 package com.example.todaymindserver.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +14,7 @@ import com.example.todaymindserver.domain.token.RefreshToken;
 import com.example.todaymindserver.domain.token.TokenErrorCode;
 import com.example.todaymindserver.repository.RefreshTokenRepository;
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,7 +44,11 @@ public class RefreshTokenService {
                 existing.updateToken(newRefreshToken);
                 return existing;
             })
-            .orElseGet(() -> RefreshToken.create(userId, newRefreshToken));
+            .orElseGet(() -> {
+                Claims claims = jwtProvider.parseClaims(newRefreshToken);
+                LocalDateTime expiresAt = jwtProvider.extractExpiration(claims);
+                return RefreshToken.create(userId, newRefreshToken, expiresAt);
+            });
 
         refreshTokenRepository.save(refreshToken);
     }
@@ -80,5 +87,15 @@ public class RefreshTokenService {
             accessToken,
             refreshToken
         );
+    }
+
+    @Transactional
+    public void deleteExpiredRefreshTokens() {
+        LocalDateTime now = LocalDateTime.now();
+        int deletedCount = refreshTokenRepository.deleteByExpiresAtBefore(now);
+
+        if (deletedCount > 0) {
+            log.info("만료 refresh token 삭제 - count={}", deletedCount);
+        }
     }
 }
