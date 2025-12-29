@@ -8,6 +8,7 @@ public record EmpatheticResponseEvent(
     Long diaryId,
     String content,
     EmotionType emotionType,
+    Long userId,
     String nickName,
     MbtiType mbtiType,
     ToneType toneType

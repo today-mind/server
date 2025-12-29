@@ -1,4 +1,4 @@
-package com.example.todaymindserver.common.util;
+package com.example.todaymindserver.common.security;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -23,7 +23,8 @@ public class SecurityResponseWriter {
         response.setContentType("application/json;charset=UTF-8");
 
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("code", errorCode.getHttpStatus());
+        body.put("status", errorCode.getHttpStatus());
+        body.put("code", errorCode.name());
         body.put("message", errorCode.getMessage());
 
         String jsonBody = objectMapper.writeValueAsString(body);

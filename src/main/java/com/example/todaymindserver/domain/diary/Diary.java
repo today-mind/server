@@ -2,7 +2,7 @@ package com.example.todaymindserver.domain.diary;
 
 import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.user.EmotionType;
-import com.example.todaymindserver.domain.user.ResponseStatusType;
+import com.example.todaymindserver.domain.clova.ResponseStatusType;
 import com.example.todaymindserver.domain.BaseTime;
 import com.example.todaymindserver.domain.user.User;
 
@@ -69,20 +69,23 @@ public class Diary extends BaseTime { // <--- BaseTimeEntity 상속 추가
         return new Diary(user, content, emotionType);
     }
 
-    public void updateEmpatheticResponse(String empatheticResponse) {
-        this.empatheticResponse = empatheticResponse;
+    public void validateRetryAllowed() {
+        if (this.responseStatus != ResponseStatusType.FAILED) {
+            throw new BusinessException(DiaryErrorCode.INVALID_RESPONSE_STATUS_TRANSITION);
+        }
     }
 
-    public void updateResponseStatusToCompleted() {
-        if (this.responseStatus != ResponseStatusType.PENDING) {
-            throw new BusinessException(ClovaErrorCode.EMPATHETIC_RESPONSE_STATUS_CONFLICT);
+    public void markResponseCompleted(String response) {
+        if (this.responseStatus == ResponseStatusType.COMPLETED) {
+            throw new BusinessException(DiaryErrorCode.INVALID_RESPONSE_STATUS_TRANSITION);
         }
+        this.empatheticResponse = response;
         this.responseStatus = ResponseStatusType.COMPLETED;
     }
 
-    public void updateResponseStatusToFailed() {
-        if (this.responseStatus != ResponseStatusType.PENDING) {
-            throw new BusinessException(ClovaErrorCode.EMPATHETIC_RESPONSE_STATUS_CONFLICT);
+    public void markResponseFailed() {
+        if (this.responseStatus == ResponseStatusType.COMPLETED) {
+            throw new BusinessException(DiaryErrorCode.INVALID_RESPONSE_STATUS_TRANSITION);
         }
         this.responseStatus = ResponseStatusType.FAILED;
     }

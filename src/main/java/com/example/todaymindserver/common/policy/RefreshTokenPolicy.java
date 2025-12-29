@@ -32,7 +32,7 @@ public class RefreshTokenPolicy {
     private void validateRefreshTokenType(Claims claims) {
         String tokenType = jwtProvider.extractTokenType(claims);
         if (!jwtProvider.getRefreshTokenTypeValue().equals(tokenType)) {
-            log.error("Token Type이 Refresh가 아닙니다. type={}", tokenType);
+            log.warn("Token Type이 Refresh가 아닙니다. 요청 token type={}", tokenType);
             throw new BusinessException(TokenErrorCode.INVALID_REFRESH_TOKEN);
         }
     }
@@ -40,7 +40,7 @@ public class RefreshTokenPolicy {
     private void validateNotExpired(Claims claims) {
         LocalDateTime expiration = jwtProvider.extractExpiration(claims);
         if (expiration.isBefore(LocalDateTime.now())) {
-            log.error("만료된 Refresh Token입니다. exp={}", expiration);
+            log.warn("만료된 Refresh Token입니다. 요청 token exp={}", expiration);
             throw new BusinessException(TokenErrorCode.INVALID_REFRESH_TOKEN);
         }
     }
@@ -50,7 +50,7 @@ public class RefreshTokenPolicy {
      */
     public void validateStoredTokenMatch(String inputToken, RefreshToken stored) {
         if (!inputToken.equals(stored.getToken())) {
-            log.error("Refresh Token 불일치: 요청={}, 저장된={}", inputToken, stored.getToken());
+            log.warn("저장된 refresh token과 불일치합니다. userId={}", stored.getUserId());
             throw new BusinessException(TokenErrorCode.INVALID_REFRESH_TOKEN);
         }
     }

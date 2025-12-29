@@ -1,4 +1,4 @@
-package com.example.todaymindserver.common.util;
+package com.example.todaymindserver.common.security;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.example.todaymindserver.domain.user;
+package com.example.todaymindserver.domain.app_lock;
 
 import org.springframework.http.HttpStatus;
 import com.example.todaymindserver.domain.ErrorCode;

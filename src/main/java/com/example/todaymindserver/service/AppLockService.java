@@ -3,8 +3,8 @@ package com.example.todaymindserver.service;
 import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.user.AppLockErrorCode;
 import com.example.todaymindserver.domain.user.User;
-import com.example.todaymindserver.domain.user.UserErrorCode;
-import com.example.todaymindserver.repository.UserRepository;
+import com.example.todaymindserver.domain.app_lock.AppLockErrorCode;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class AppLockService {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -26,8 +26,7 @@ public class AppLockService {
      */
     @Transactional
     public void setAppLock(Long userId, String password) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+        User user = userService.getUser(userId);
 
         // password가 빈 문자열("") 혹은 공백으로 오면 잠금 해제(null 처리)로 판단합니다.
         if (!StringUtils.hasText(password)) {
@@ -41,8 +40,7 @@ public class AppLockService {
 
     @Transactional(readOnly = true)
     public void verifyAppLock(Long userId, String inputPassword) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+        User user = userService.getUser(userId);
 
         if (user.getPassword() == null) {
             throw new BusinessException(AppLockErrorCode.APP_LOCK_NOT_SET);
