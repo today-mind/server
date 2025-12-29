@@ -2,9 +2,14 @@ package com.example.todaymindserver.service;
 
 import java.time.LocalDateTime;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.todaymindserver.common.client.slack.SlackNotifierClient;
 import com.example.todaymindserver.common.policy.RefreshTokenPolicy;
 import com.example.todaymindserver.common.util.JwtProvider;
 import com.example.todaymindserver.dto.request.RefreshTokenRequestDto;
@@ -23,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
+    private final SlackNotifierClient slackNotifierClient;
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenPolicy refreshTokenPolicy;
     private final JwtProvider jwtProvider;
@@ -89,6 +95,11 @@ public class RefreshTokenService {
         );
     }
 
+    @Retryable(
+        retryFor = { DataAccessException.class },
+        maxAttempts = 2, // 최초 1회 + 재시도 1회
+        backoff = @Backoff(delay = 1000)
+    )
     @Transactional
     public void deleteExpiredRefreshTokens() {
         LocalDateTime now = LocalDateTime.now();
@@ -97,5 +108,26 @@ public class RefreshTokenService {
         if (deletedCount > 0) {
             log.info("만료 refresh token 삭제 - count={}", deletedCount);
         }
+    }
+
+    @Recover
+    public void recover(DataAccessException e) {
+        log.error(
+            "[Scheduler][RefreshTokenCleanup] 재시도 1회 후 최종 실패 - reason={}",
+            e.getMessage(),
+            e
+        );
+
+        slackNotifierClient.sendNotification("""
+        [Refresh token 정리 스케줄 실패]
+        • 작업: RefreshTokenCleanup
+        • 재시도: 1회 후 실패
+        • 원인: %s
+        • 시각: %s
+        """.formatted(
+                e.getMessage(),
+                LocalDateTime.now()
+            )
+        );
     }
 }
