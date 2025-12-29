@@ -33,7 +33,6 @@ public class UserController {
             @AuthenticationPrincipal Long userId,
             @RequestBody @Valid NicknameRequestDto request) {
 
-        log.info("닉네임 설정 요청 - UserID: {}, NewNickname: {}", userId, request.getNickname());
         NicknameResponseDto updatedNickname = userService.setupNickname(userId, request);
         return ApiResponse.success("닉네임 설정 완료", updatedNickname);
     }
@@ -45,7 +44,6 @@ public class UserController {
     public ApiResponse<ProfileResponseDto> getProfile(
             @AuthenticationPrincipal Long userId) { // ✅ 인증된 유저 정보 조회
 
-        log.info("프로필 조회 요청 - UserID: {}", userId);
         ProfileResponseDto profile = userService.getProfile(userId);
         return ApiResponse.success("프로필 정보 조회 완료", profile);
     }
