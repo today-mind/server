@@ -1,4 +1,4 @@
-package com.example.todaymindserver.common.util;
+package com.example.todaymindserver.common.security;
 
 import java.io.IOException;
 

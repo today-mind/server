@@ -66,7 +66,7 @@ public class RefreshTokenService {
 
         RefreshToken storedRefreshToken = refreshTokenRepository.findById(userId)
             .orElseThrow(() -> {
-                log.error("사용자 {} 에 대한 RefreshToken 엔티티가 존재하지 않습니다.", userId);
+                log.warn("refresh token을 가지고 있지 않습니다. userId={}", userId);
                 return new BusinessException(TokenErrorCode.NOT_FOUND_REFRESH_TOKEN);
             });
 

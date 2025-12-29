@@ -34,7 +34,7 @@ public class AiClient {
     public static final double REPEAT_PENALTY = 1.1;
     public static final int MAX_TOKENS = 256;
 
-    public ClovaResponse getClovaAnswer(List<Message> messages)  {
+    public ClovaResponse getAiResponse(List<Message> messages)  {
 
         Map<String, Object> body = new HashMap<>();
         body.put("messages", messages);
@@ -51,7 +51,7 @@ public class AiClient {
             .body(body)
             .retrieve()
             .onStatus(HttpStatusCode::isError, (req, res) -> {
-                log.error("Clova AI 응답 API 요청 중 오류가 발생하였습니다: {}", res.getStatusCode());
+                log.error("AI 응답 API 요청 중 오류가 발생하였습니다: {}", res.getStatusCode());
             })
             .body(ClovaResponse.class);
     }

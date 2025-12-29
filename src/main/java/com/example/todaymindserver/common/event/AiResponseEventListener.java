@@ -37,7 +37,7 @@ public class AiResponseEventListener {
             event.mbtiType(),
             event.toneType()
         );
-        ClovaResponse response = aiClient.getClovaAnswer(messages);
+        ClovaResponse response = aiClient.getAiResponse(messages);
 
         aiService.saveAiResponse(
             event.userId(),
