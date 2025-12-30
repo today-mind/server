@@ -1,5 +1,7 @@
 package com.example.todaymindserver.common.exception;
 
+import java.time.DateTimeException;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -40,6 +42,22 @@ public class GlobalExceptionHandler {
 
         Long userId = SecurityUtil.getCurrentUserIdOrNull();
         log.warn("Request Body - Dto 매핑 오류. userId={}, 상세 메시지={}", userId, e.getBindingResult().getFieldErrors().get(0).getDefaultMessage());
+
+        ErrorResponse response = ErrorResponse.builder()
+            .status(400)
+            .code("BAD_REQUEST")
+            .message(e.getBindingResult().getFieldErrors().get(0).getDefaultMessage())
+            .build();
+
+        return ResponseEntity.status(400).body(response);
+    }
+
+    /** 날짜 범위 검증 실패 오류 */
+    @ExceptionHandler(DateTimeException.class)
+    public ResponseEntity<ErrorResponse> handleDateTimeException(DateTimeException e) {
+
+        Long userId = SecurityUtil.getCurrentUserIdOrNull();
+        log.warn("날짜 범위 - 검증 실패. userId={}, 상세 메시지={}", userId, e.getMessage());
 
         ErrorResponse response = ErrorResponse.builder()
             .status(400)
