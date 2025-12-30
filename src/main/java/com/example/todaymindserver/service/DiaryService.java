@@ -110,7 +110,7 @@ public class DiaryService {
         User user = userService.getUser(userId);
 
         // 3. DB에서 해당 월의 일기 목록 조회 (특정 사용자의 일기만)
-        List<Diary> diaries = diaryRepository.findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(
+        List<Diary> diaries = diaryRepository.findByUserAndCreatedAtBetweenAndDeletedAtIsNullOrderByCreatedAtDesc(
             user,
             start,
             end
@@ -164,7 +164,7 @@ public class DiaryService {
         LocalDateTime startOfNextMonth = startOfMonth.plusMonths(1);
 
         // 3. Repository를 통해 기간 내 일기 목록 조회
-        List<Diary> diaries = diaryRepository.findAllByUserAndCreatedAtBetween(user, startOfMonth, startOfNextMonth);
+        List<Diary> diaries = diaryRepository.findByUserAndCreatedAtBetweenAndDeletedAtIsNullOrderByCreatedAtDesc(user, startOfMonth, startOfNextMonth);
 
         // 4. 감정별 그룹화 및 개수 집계
         // diary.getEmotionType().name() -> "HAPPY", "SAD" 등의 문자열을 키로 사용합니다.
@@ -184,7 +184,7 @@ public class DiaryService {
     }
 
     public Diary getDiary(Long userId, Long diaryId) {
-        return diaryRepository.findById(diaryId)
+        return diaryRepository.findByDiaryIdAndDeletedAtIsNull(diaryId)
             .orElseThrow(() -> {
                 log.warn("일기가 존재하지 않습니다. userId={}, diaryId={}", userId, diaryId);
                 return new BusinessException(DiaryErrorCode.DIARY_NOT_FOUND);
@@ -230,6 +230,6 @@ public class DiaryService {
         diary.validateOwner(userId);
 
         // 4. 일기 삭제
-        diaryRepository.delete(diary);
+        diary.softDelete();
     }
 }
