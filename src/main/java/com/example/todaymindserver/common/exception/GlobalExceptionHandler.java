@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
         ErrorResponse response = ErrorResponse.builder()
             .status(400)
             .code("BAD_REQUEST")
-            .message("잘못된 요청 값 입니다.")
+            .message(e.getBindingResult().getFieldErrors().get(0).getDefaultMessage())
             .build();
 
         return ResponseEntity.status(400).body(response);
