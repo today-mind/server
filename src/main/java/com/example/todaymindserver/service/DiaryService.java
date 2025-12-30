@@ -3,8 +3,8 @@ package com.example.todaymindserver.service;
 import com.example.todaymindserver.common.event.dto.EmpatheticResponseEvent;
 import com.example.todaymindserver.domain.user.EmotionType;
 import com.example.todaymindserver.dto.request.DiaryRequestDto;
-import com.example.todaymindserver.dto.response.DiaryCalendarResponseDto; // Import 추가
-import com.example.todaymindserver.dto.response.DiaryDetailResponseDto; // Import 추가
+import com.example.todaymindserver.dto.response.DiaryCalendarResponseDto;
+import com.example.todaymindserver.dto.response.DiaryDetailResponseDto;
 import com.example.todaymindserver.dto.response.DiaryResponseDto;
 import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.diary.Diary;
@@ -102,20 +102,18 @@ public class DiaryService {
     public DiaryCalendarResponseDto getCalendarDiaries(Long userId, YearMonth yearMonth) {
 
         // 1. 해당 월의 시작일과 종료일 계산
-        LocalDate startDate = yearMonth.atDay(1);
-        LocalDate endDate = yearMonth.atEndOfMonth();
+        LocalDateTime start = yearMonth.atDay(1).atStartOfDay();
+        LocalDateTime end = yearMonth.plusMonths(1).atDay(1).atStartOfDay();
 
-        LocalDateTime startOfMonth = startDate.atStartOfDay();
-        LocalDateTime endOfMonth = endDate.atTime(23, 59, 59);
 
         // 2. User 엔티티 조회
         User user = userService.getUser(userId);
 
         // 3. DB에서 해당 월의 일기 목록 조회 (특정 사용자의 일기만)
         List<Diary> diaries = diaryRepository.findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(
-                user,
-                startOfMonth,
-                endOfMonth
+            user,
+            start,
+            end
         );
 
         // 4. DTO로 변환
