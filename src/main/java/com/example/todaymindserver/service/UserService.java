@@ -85,11 +85,12 @@ public class UserService {
 
     @Transactional
     public void delete(Long userId) {
-        getUser(userId);
+        User user = getUser(userId);
 
+        // 연관된 코드 삭제
         refreshTokenRepository.deleteByUserId(userId);
         diaryRepository.findAllByUser_UserIdAndDeletedAtIsNull(userId).forEach(Diary::softDelete);
-        userRepository.deleteById(userId);
+        user.softDelete();
     }
 
     @Transactional(readOnly = true)
