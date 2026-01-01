@@ -58,6 +58,8 @@ public class User extends BaseTime {
     private LocalDateTime updatedAt;
     private String password;
 
+    private LocalDateTime deletedAt;
+
     private User(String email, OauthProviderType provider, String providerUserId) {
         this.email = email;
         this.provider = provider;
@@ -92,6 +94,12 @@ public class User extends BaseTime {
         if (getNickName() == null) {
             log.error("사용자의 닉네임이 존재하지 않습니다. userId={}", getUserId());
             throw new BusinessException(UserErrorCode.NICKNAME_REQUIRED);
+        }
+    }
+
+    public void softDelete() {
+        if (this.deletedAt == null) {
+            this.deletedAt = LocalDateTime.now();
         }
     }
 }
