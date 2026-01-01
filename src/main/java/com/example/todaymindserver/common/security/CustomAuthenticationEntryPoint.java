@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private SecurityServletErrorCode resolveErrorCode(AuthenticationException authException) {
+    private SecurityServletErrorCode resolveErrorCode(AuthenticationException authException, HttpServletRequest req) {
         Throwable cause = authException.getCause();
 
         // 1) cause 없음
@@ -27,7 +27,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                 log.warn("JWT 인증 실패(BadCredentialsException, cause 없음): message={}", authException.getMessage());
                 return SecurityServletErrorCode.INVALID_JWT;
             }
-            log.warn("인증 실패(원인 알 수 없음): message={}", authException.getMessage());
+            log.warn("인증 실패(원인 알 수 없음): url={}, message={}", req.getRequestURI(), authException.getMessage());
             return SecurityServletErrorCode.UNAUTHORIZED;
         }
 
@@ -57,7 +57,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         AuthenticationException authException
     ) throws IOException {
 
-        SecurityServletErrorCode errorCode = resolveErrorCode(authException);
+        SecurityServletErrorCode errorCode = resolveErrorCode(authException, request);
 
         SecurityResponseWriter.writeJsonErrorResponse(response, errorCode);
     }
