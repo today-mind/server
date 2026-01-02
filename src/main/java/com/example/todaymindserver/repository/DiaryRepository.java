@@ -23,4 +23,6 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
     List<Diary> findAllByUser_UserIdAndDeletedAtIsNull(Long userUserId);
 
     Optional<Diary> findByDiaryIdAndDeletedAtIsNull(Long diaryId);
+
+    boolean existsByUserAndCreatedAtBetweenAndDeletedAtIsNotNull(User user, LocalDateTime start, LocalDateTime end);
 }
