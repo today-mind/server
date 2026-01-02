@@ -2,11 +2,16 @@ package com.example.todaymindserver.common.util;
 
 import java.io.IOException;
 
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.example.todaymindserver.service.JwtAuthenticationService;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -39,8 +44,12 @@ public class JwtFilter extends OncePerRequestFilter {
                 );
             }
 
+        } catch (ExpiredJwtException | MalformedJwtException | UnsupportedJwtException | SignatureException e) {
+            throw new BadCredentialsException("Invalid JWT", e);
         } catch (Exception e) {
-            SecurityContextHolder.clearContext();
+            // 👉 정말 예상 못 한 오류
+            log.error("[JWT FILTER ERROR] 알 수 없는 인증 처리 오류", e);
+            throw new BadCredentialsException("Authentication processing failed", e);
         }
         chain.doFilter(request, response);
     }
