@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.YearMonth; // Import 추가
+import java.time.YearMonth;
 
 /**
  * 일기(Diary) 관련 API Controller
@@ -105,5 +105,17 @@ public class DiaryController {
         diaryService.getAiResponse(userId, diaryId);
 
         return ApiResponse.success("AI 응답 요청 접수 완료", null, HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/diaries/today/status")
+    public ApiResponse<Boolean> getTodayStatus(
+        @AuthenticationPrincipal Long userId,
+        @RequestParam int year,
+        @RequestParam int month,
+        @RequestParam int day
+    ) {
+        boolean todayStatus = diaryService.getTodayStatus(userId, year, month, day);
+
+        return ApiResponse.success("오늘 삭제 상태 응답 완료", todayStatus);
     }
 }
