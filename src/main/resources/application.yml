@@ -17,6 +17,7 @@ logging:
   level:
     root: info
     com.example.todaymindserver: info
+    com.example.todaymindserver.common.security: warn
     org.hibernate.sql: off
     org.hibernate.type.descriptor.sql: off
 
