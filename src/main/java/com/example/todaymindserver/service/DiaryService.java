@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
@@ -231,5 +232,19 @@ public class DiaryService {
 
         // 4. 일기 삭제
         diary.softDelete();
+    }
+
+    @Transactional(readOnly = true)
+    public boolean getTodayStatus(Long userId, int year, int month, int day) {
+        // 1. 유저 조회 (없으면 예외 발생)
+        User user = userService.getUser(userId);
+
+        LocalDate targetDate = LocalDate.of(year, month, day);
+        LocalDateTime start = targetDate.atStartOfDay();
+        LocalDateTime end = targetDate.atTime(LocalTime.MAX);
+
+        return diaryRepository.existsByUserAndCreatedAtBetweenAndDeletedAtIsNotNull(
+                user, start, end
+            );
     }
 }
