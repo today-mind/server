@@ -10,7 +10,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.example.todaymindserver.common.security.CustomAccessDeniedHandler;
@@ -62,7 +62,7 @@ public class SecurityConfig {
                         .anyRequest().denyAll()
                 )
 
-                .addFilterBefore(new JwtFilter(jwtAuthenticationService, jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new JwtFilter(jwtAuthenticationService, jwtUtil), ExceptionTranslationFilter.class)
 
                 .exceptionHandling(configurer ->
                         configurer
