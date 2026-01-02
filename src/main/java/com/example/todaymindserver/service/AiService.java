@@ -32,4 +32,10 @@ public class AiService {
             diary.markResponseFailed();
         }
     }
+
+    @Transactional
+    public void markFailed(Long userId, Long diaryId) {
+        Diary diary = diaryService.getDiary(userId, diaryId);
+        diary.markResponseFailed();
+    }
 }
