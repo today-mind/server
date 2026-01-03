@@ -1,6 +1,7 @@
 package com.example.todaymindserver.service;
 
 import com.example.todaymindserver.common.event.dto.EmpatheticResponseEvent;
+import com.example.todaymindserver.domain.diary_write_status.DiaryWriteStatus;
 import com.example.todaymindserver.domain.user.EmotionType;
 import com.example.todaymindserver.dto.request.DiaryRequestDto;
 import com.example.todaymindserver.dto.response.DiaryCalendarResponseDto;
@@ -10,6 +11,7 @@ import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.diary.Diary;
 import com.example.todaymindserver.domain.diary.DiaryErrorCode;
 import com.example.todaymindserver.domain.user.User;
+import com.example.todaymindserver.dto.response.DiaryWriteStatusResponseDto;
 import com.example.todaymindserver.dto.response.EmotionReportResponseDto;
 import com.example.todaymindserver.repository.DiaryRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ public class DiaryService {
 
     private final DiaryRepository diaryRepository;
     private final UserService userService;
+    private final DiaryWriteStatusService diaryWriteStatusService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     /**
@@ -53,18 +55,16 @@ public class DiaryService {
         // 1. User 엔티티 조회
         User user = userService.getUser(userId);
 
+        // 2. User 닉네임이 존재하는지 판단(정책)
         user.validateUserNickNameExists();
 
-        LocalDate today = LocalDate.now();
-        LocalDateTime start = today.atStartOfDay();
-        LocalDateTime end = today.plusDays(1).atStartOfDay();
+        // 3. 일기 작성 상태 확인(정책)
+        DiaryWriteStatus diaryWriteStatus = diaryWriteStatusService.validateDiaryWritable(user);
 
-        if(diaryRepository.existsByUserAndCreatedAtBetween(user, start, end)) {
-            log.warn("일기는 하루에 한 번만 작성할 수 있습니다. userId={}", userId);
-            throw new BusinessException(DiaryErrorCode.DIARY_ALREADY_EXISTS_TODAY);
-        }
+        // 4. 일기 작성 상태 WRITTEN으로 수정(정책)
+        diaryWriteStatus.markWritten();
 
-        // 2. Diary 엔티티 생성 및 저장
+        // 5. Diary 엔티티 생성 및 저장
         Diary diary = Diary.create(
                 user,
                 request.getContent(),
@@ -72,7 +72,7 @@ public class DiaryService {
         );
         diaryRepository.save(diary);
 
-        // 3. Ai 응답 이벤트 발행
+        // 6. Ai 응답 이벤트 발행
         applicationEventPublisher.publishEvent(
             new EmpatheticResponseEvent(
                 diary.getDiaryId(),
@@ -111,7 +111,7 @@ public class DiaryService {
         User user = userService.getUser(userId);
 
         // 3. DB에서 해당 월의 일기 목록 조회 (특정 사용자의 일기만)
-        List<Diary> diaries = diaryRepository.findByUserAndCreatedAtBetweenAndDeletedAtIsNullOrderByCreatedAtDesc(
+        List<Diary> diaries = diaryRepository.findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(
             user,
             start,
             end
@@ -165,7 +165,7 @@ public class DiaryService {
         LocalDateTime startOfNextMonth = startOfMonth.plusMonths(1);
 
         // 3. Repository를 통해 기간 내 일기 목록 조회
-        List<Diary> diaries = diaryRepository.findByUserAndCreatedAtBetweenAndDeletedAtIsNullOrderByCreatedAtDesc(user, startOfMonth, startOfNextMonth);
+        List<Diary> diaries = diaryRepository.findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(user, startOfMonth, startOfNextMonth);
 
         // 4. 감정별 그룹화 및 개수 집계
         // diary.getEmotionType().name() -> "HAPPY", "SAD" 등의 문자열을 키로 사용합니다.
@@ -185,7 +185,7 @@ public class DiaryService {
     }
 
     public Diary getDiary(Long userId, Long diaryId) {
-        return diaryRepository.findByDiaryIdAndDeletedAtIsNull(diaryId)
+        return diaryRepository.findById(diaryId)
             .orElseThrow(() -> {
                 log.warn("일기가 존재하지 않습니다. userId={}, diaryId={}", userId, diaryId);
                 return new BusinessException(DiaryErrorCode.DIARY_NOT_FOUND);
@@ -222,7 +222,7 @@ public class DiaryService {
     @Transactional
     public void deleteDiary(Long userId, Long diaryId) {
         // 1. User 엔티티 조회
-        userService.getUser(userId);
+        User user = userService.getUser(userId);
 
         // 2. 일기 조회
         Diary diary = getDiary(userId, diaryId);
@@ -230,21 +230,24 @@ public class DiaryService {
         // 3. 본인 일기 검증
         diary.validateOwner(userId);
 
-        // 4. 일기 삭제
-        diary.softDelete();
+        // 4. 일기 작성 상태 DELETED로 수정(정책)
+        LocalDate now = LocalDate.now();
+        DiaryWriteStatus diaryWriteStatus = diaryWriteStatusService.getDiaryWriteStatus(user, now);
+        diaryWriteStatus.markDeleted();
+
+        // 5. 일기 삭제
+        diaryRepository.delete(diary);
     }
 
-    @Transactional(readOnly = true)
-    public boolean getTodayStatus(Long userId, int year, int month, int day) {
+    @Transactional
+    public DiaryWriteStatusResponseDto getTodayStatus(Long userId, int year, int month, int day) {
         // 1. 유저 조회 (없으면 예외 발생)
         User user = userService.getUser(userId);
 
         LocalDate targetDate = LocalDate.of(year, month, day);
-        LocalDateTime start = targetDate.atStartOfDay();
-        LocalDateTime end = targetDate.atTime(LocalTime.MAX);
 
-        return diaryRepository.existsByUserAndCreatedAtBetweenAndDeletedAtIsNotNull(
-                user, start, end
-            );
+        DiaryWriteStatus diaryWriteStatus = diaryWriteStatusService.getDiaryWriteStatus(user, targetDate);
+
+        return new DiaryWriteStatusResponseDto(diaryWriteStatus.getStatus());
     }
 }

@@ -2,7 +2,9 @@ package com.example.todaymindserver.domain.user;
 
 import com.example.todaymindserver.domain.BaseTime;
 import com.example.todaymindserver.domain.BusinessException;
+import com.example.todaymindserver.domain.diary.Diary;
 import com.example.todaymindserver.domain.oauth.OauthProviderType;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +16,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Entity
@@ -37,6 +41,9 @@ public class User extends BaseTime {
     @Column(nullable = false, unique = true)
     private String providerUserId;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Diary> diaries = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MbtiType mbtiType = MbtiType.T;
@@ -58,8 +65,6 @@ public class User extends BaseTime {
     private LocalDateTime updatedAt;
     private String password;
 
-    private LocalDateTime deletedAt;
-
     private User(String email, OauthProviderType provider, String providerUserId) {
         this.email = email;
         this.provider = provider;
@@ -71,7 +76,7 @@ public class User extends BaseTime {
     }
 
     public void updateNickname(String nickname) {
-        this.nickName = nickname;
+            this.nickName = nickname;
     }
 
     public void updatePassword(String password) {
@@ -79,27 +84,17 @@ public class User extends BaseTime {
     }
 
     public void updateMbtiType(MbtiType mbtiType) {
-        if (mbtiType != null) {
-            this.mbtiType = mbtiType;
-        }
+        this.mbtiType = mbtiType;
     }
 
     public void updateToneType(ToneType toneType) {
-        if (toneType != null) {
-            this.toneType = toneType;
-        }
+        this.toneType = toneType;
     }
 
     public void validateUserNickNameExists() {
         if (getNickName() == null) {
             log.error("사용자의 닉네임이 존재하지 않습니다. userId={}", getUserId());
             throw new BusinessException(UserErrorCode.NICKNAME_REQUIRED);
-        }
-    }
-
-    public void softDelete() {
-        if (this.deletedAt == null) {
-            this.deletedAt = LocalDateTime.now();
         }
     }
 }

@@ -5,6 +5,7 @@ import com.example.todaymindserver.dto.request.DiaryRequestDto;
 import com.example.todaymindserver.dto.response.DiaryCalendarResponseDto;
 import com.example.todaymindserver.dto.response.DiaryDetailResponseDto;
 import com.example.todaymindserver.dto.response.DiaryResponseDto;
+import com.example.todaymindserver.dto.response.DiaryWriteStatusResponseDto;
 import com.example.todaymindserver.dto.response.EmotionReportResponseDto;
 import com.example.todaymindserver.service.DiaryService;
 import jakarta.validation.Valid;
@@ -108,14 +109,14 @@ public class DiaryController {
     }
 
     @GetMapping("/diaries/today/status")
-    public ApiResponse<Boolean> getTodayStatus(
+    public ApiResponse<DiaryWriteStatusResponseDto> getTodayStatus(
         @AuthenticationPrincipal Long userId,
         @RequestParam int year,
         @RequestParam int month,
         @RequestParam int day
     ) {
-        boolean todayStatus = diaryService.getTodayStatus(userId, year, month, day);
+        DiaryWriteStatusResponseDto todayStatus = diaryService.getTodayStatus(userId, year, month, day);
 
-        return ApiResponse.success("오늘 삭제 상태 응답 완료", todayStatus);
+        return ApiResponse.success("일기 작성 상태 여부 응답 완료", todayStatus);
     }
 }
