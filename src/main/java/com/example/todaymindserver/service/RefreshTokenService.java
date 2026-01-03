@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.todaymindserver.common.client.slack.SlackNotifierClient;
 import com.example.todaymindserver.common.policy.RefreshTokenPolicy;
 import com.example.todaymindserver.common.util.JwtProvider;
+import com.example.todaymindserver.domain.user.User;
 import com.example.todaymindserver.dto.request.RefreshTokenRequestDto;
 import com.example.todaymindserver.dto.response.RefreshTokenResponseDto;
 import com.example.todaymindserver.domain.BusinessException;
@@ -33,30 +34,37 @@ public class RefreshTokenService {
     private final RefreshTokenPolicy refreshTokenPolicy;
     private final JwtProvider jwtProvider;
 
-    /**
-     * Refresh Token을 저장하거나 기존 토큰을 새로운 값으로 교체한다.
-     * <ol>
-     * <li>DB에 존재하는 최신 Refresh Token만을 유효 값으로 유지하기 위한 저장 로직.</li>
-     * <li>Rotation 정책 적용을 위해 기존 토큰을 폐기하고 새 토큰으로 갱신하는 역할을 수행한다.</li>
-     * <li>토큰 검증은 별도 정책에서 처리하고, 이 메서드는 DB 상태 변경에만 집중한다.</li>
-     * <li>다중 디바이스 또는 동시 로그인 요청에서도 마지막 토큰만 유효하도록 일관성을 보장한다.</li>
-     * </ol>
-     */
     @Transactional
-    protected void saveOrUpdate(Long userId, String newRefreshToken) {
+    public void issueInitialToken(User user, String refreshToken) {
 
-        RefreshToken refreshToken = refreshTokenRepository.findById(userId)
-            .map(existing -> {
-                existing.updateToken(newRefreshToken);
-                return existing;
-            })
-            .orElseGet(() -> {
-                Claims claims = jwtProvider.parseClaims(newRefreshToken);
-                LocalDateTime expiresAt = jwtProvider.extractExpiration(claims);
-                return RefreshToken.create(userId, newRefreshToken, expiresAt);
+        if (refreshTokenRepository.existsById(user.getUserId())) {
+            return; // 이미 존재하면 생성 안 함
+        }
+
+        Claims claims = jwtProvider.parseClaims(refreshToken);
+        LocalDateTime expiresAt = jwtProvider.extractExpiration(claims);
+
+        RefreshToken token = RefreshToken.create(
+            user.getUserId(),
+            refreshToken,
+            expiresAt
+        );
+
+        refreshTokenRepository.save(token);
+    }
+
+    @Transactional(readOnly = true)
+    protected RefreshToken getRefreshToken(Long userId) {
+        return refreshTokenRepository.findById(userId)
+            .orElseThrow(() -> {
+                log.warn("refresh token을 가지고 있지 않습니다. userId={}", userId);
+                return new BusinessException(TokenErrorCode.NOT_FOUND_REFRESH_TOKEN);
             });
+    }
 
-        refreshTokenRepository.save(refreshToken);
+    @Transactional
+    public void deleteRefreshToken(Long userId) {
+        refreshTokenRepository.deleteById(userId);
     }
 
     /**
@@ -77,17 +85,15 @@ public class RefreshTokenService {
 
         Long userId = jwtProvider.extractUserId(jwtProvider.parseClaims(inputToken));
 
-        RefreshToken storedRefreshToken = refreshTokenRepository.findById(userId)
-            .orElseThrow(() -> {
-                log.warn("refresh token을 가지고 있지 않습니다. userId={}", userId);
-                return new BusinessException(TokenErrorCode.NOT_FOUND_REFRESH_TOKEN);
-            });
+        RefreshToken storedRefreshToken = getRefreshToken(userId);
 
         refreshTokenPolicy.validateStoredTokenMatch(inputToken, storedRefreshToken);
 
         String accessToken = jwtProvider.createAccessToken(userId);
         String refreshToken = jwtProvider.createRefreshToken(userId);
-        saveOrUpdate(userId, refreshToken);
+
+        // token 업데이트
+        storedRefreshToken.updateToken(refreshToken);
 
         return new RefreshTokenResponseDto(
             accessToken,

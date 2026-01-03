@@ -1,15 +1,12 @@
 package com.example.todaymindserver.service;
 
 import com.example.todaymindserver.common.response.dto.ProfileResponseDto;
-import com.example.todaymindserver.domain.diary.Diary;
 import com.example.todaymindserver.dto.request.AiSettingsRequestDto;
 import com.example.todaymindserver.dto.request.NicknameRequestDto;
 import com.example.todaymindserver.dto.response.NicknameResponseDto;
 import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.user.User;
 import com.example.todaymindserver.domain.user.UserErrorCode;
-import com.example.todaymindserver.repository.DiaryRepository;
-import com.example.todaymindserver.repository.RefreshTokenRepository;
 import com.example.todaymindserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final DiaryRepository diaryRepository;
+    private final RefreshTokenService refreshTokenService;
 
     /** 1. 닉네임 설정 (PATCH /api/nickname) */
     @Transactional
@@ -78,9 +74,9 @@ public class UserService {
 
     @Transactional
     public void logout(Long userId) {
-        getUser(userId);
+        User user = getUser(userId);
 
-        refreshTokenRepository.deleteByUserId(userId);
+        refreshTokenService.deleteRefreshToken(user.getUserId());
     }
 
     @Transactional
@@ -88,9 +84,8 @@ public class UserService {
         User user = getUser(userId);
 
         // 연관된 코드 삭제
-        refreshTokenRepository.deleteByUserId(userId);
-        diaryRepository.findAllByUser_UserIdAndDeletedAtIsNull(userId).forEach(Diary::softDelete);
-        user.softDelete();
+        refreshTokenService.deleteRefreshToken(user.getUserId());
+        userRepository.delete(user);
     }
 
     @Transactional(readOnly = true)

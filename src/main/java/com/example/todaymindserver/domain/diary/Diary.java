@@ -1,7 +1,5 @@
 package com.example.todaymindserver.domain.diary;
 
-import java.time.LocalDateTime;
-
 import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.user.EmotionType;
 import com.example.todaymindserver.domain.clova.ResponseStatusType;
@@ -61,8 +59,6 @@ public class Diary extends BaseTime { // <--- BaseTimeEntity 상속 추가
     @Column(name = "response_status_type", nullable = false)
     private ResponseStatusType responseStatus = ResponseStatusType.PENDING;
 
-    private LocalDateTime deletedAt;
-
     private Diary(User user, String content, EmotionType emotionType) {
         this.user = user;
         this.content = content;
@@ -98,11 +94,5 @@ public class Diary extends BaseTime { // <--- BaseTimeEntity 상속 추가
             throw new BusinessException(DiaryErrorCode.INVALID_RESPONSE_STATUS_TRANSITION);
         }
         this.responseStatus = ResponseStatusType.FAILED;
-    }
-
-    public void softDelete() {
-        if (this.deletedAt == null) {
-            this.deletedAt = LocalDateTime.now();
-        }
     }
 }

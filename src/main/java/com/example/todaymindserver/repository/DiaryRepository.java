@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Diary 엔티티 데이터 접근 계층 (Repository)
@@ -16,13 +15,5 @@ import java.util.Optional;
 @Repository
 public interface DiaryRepository extends JpaRepository<Diary, Long> {
 
-    List<Diary> findByUserAndCreatedAtBetweenAndDeletedAtIsNullOrderByCreatedAtDesc(User user, LocalDateTime start, LocalDateTime end);
-
-    boolean existsByUserAndCreatedAtBetween(User user, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore);
-
-    List<Diary> findAllByUser_UserIdAndDeletedAtIsNull(Long userUserId);
-
-    Optional<Diary> findByDiaryIdAndDeletedAtIsNull(Long diaryId);
-
-    boolean existsByUserAndCreatedAtBetweenAndDeletedAtIsNotNull(User user, LocalDateTime start, LocalDateTime end);
+    List<Diary> findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(User user, LocalDateTime start, LocalDateTime end);
 }
