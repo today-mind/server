@@ -26,11 +26,16 @@ public class DiaryWriteStatus extends BaseTime {
     private Long id;
 
     /**
-     * 사용자
-     * - 정책 판단용이므로 cascade ❌
+     * 사용자 고유 식별자
      */
     @Column(name = "provider_user_id", nullable = false)
     private String userId;
+
+    /*
+     * 일기 식별값
+     */
+    @Column(name = "diary_id")
+    private Long diaryId;
 
     /**
      * 일기 기준 날짜 (하루 1회 정책의 기준)
@@ -63,5 +68,13 @@ public class DiaryWriteStatus extends BaseTime {
 
     public void markDeleted() {
         this.status = DiaryWriteStatusType.DELETED;
+    }
+
+    public void linkDiary(Long diaryId) {
+        this.diaryId = diaryId;
+    }
+
+    public void unLinkDiary() {
+        this.diaryId = null;
     }
 }

@@ -72,6 +72,9 @@ public class DiaryService {
         );
         diaryRepository.save(diary);
 
+        // 6. Diary와 일기 작성 상태 연결
+        diaryWriteStatus.linkDiary(diary.getDiaryId());
+
         // 6. Ai 응답 이벤트 발행
         applicationEventPublisher.publishEvent(
             new EmpatheticResponseEvent(
@@ -235,7 +238,10 @@ public class DiaryService {
         DiaryWriteStatus diaryWriteStatus = diaryWriteStatusService.getDiaryWriteStatus(user, now);
         diaryWriteStatus.markDeleted();
 
-        // 5. 일기 삭제
+        // 5. Diary와 일기 작성 상태 연결 해제
+        diaryWriteStatus.unLinkDiary();
+
+        // 6. 일기 삭제
         diaryRepository.delete(diary);
     }
 
@@ -248,6 +254,9 @@ public class DiaryService {
 
         DiaryWriteStatus diaryWriteStatus = diaryWriteStatusService.getDiaryWriteStatus(user, targetDate);
 
-        return new DiaryWriteStatusResponseDto(diaryWriteStatus.getStatus());
+        return new DiaryWriteStatusResponseDto(
+            diaryWriteStatus.getStatus(),
+            diaryWriteStatus.getDiaryId()
+        );
     }
 }
