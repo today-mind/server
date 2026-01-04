@@ -91,7 +91,7 @@ public class GlobalExceptionHandler {
         ErrorResponse response = ErrorResponse.builder()
                 .status(e.getErrorCode().getHttpStatus().value())
                 .code(e.getErrorCode().getHttpStatus().name())
-                .message(e.getErrorCode().getMessage())
+                .message(e.getMessage())
                 .build();
 
         return ResponseEntity.status(e.getErrorCode().getHttpStatus().value()).body(response);

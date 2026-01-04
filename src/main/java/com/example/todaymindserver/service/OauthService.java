@@ -68,7 +68,11 @@ public class OauthService {
             userInfo.sub()
         ).ifPresent(history -> {
             if(history.isCooldownActive(rejoinCooldownHours)) {
-                throw new BusinessException(UserErrorCode.REJOIN_COOLDOWN_ACTIVE);
+                throw new BusinessException(
+                    UserErrorCode.REJOIN_COOLDOWN_ACTIVE,
+                    String.format("회원 탈퇴 후 %s시간이 지나야 다시 가입할 수 있습니다.", rejoinCooldownHours)
+                );
+
             }
         });
 
