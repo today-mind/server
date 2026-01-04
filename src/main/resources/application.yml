@@ -11,7 +11,7 @@ spring:
   jpa:
     show-sql: false
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
 
 logging:
   level:
@@ -37,6 +37,9 @@ jwt:
 clova:
   completion-url: ${CLOVA_COMPLETION_URL}
   api-key: ${CLOVA_API_KEY}
+
+policy:
+  rejoin-cooldown-hours: 48
 
 slack:
   webhook:

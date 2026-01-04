@@ -1,6 +1,9 @@
 package com.example.todaymindserver.service;
 
+import java.time.LocalDateTime;
+
 import com.example.todaymindserver.common.response.dto.ProfileResponseDto;
+import com.example.todaymindserver.domain.user.UserWithdrawalHistory;
 import com.example.todaymindserver.dto.request.AiSettingsRequestDto;
 import com.example.todaymindserver.dto.request.NicknameRequestDto;
 import com.example.todaymindserver.dto.response.NicknameResponseDto;
@@ -8,6 +11,8 @@ import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.user.User;
 import com.example.todaymindserver.domain.user.UserErrorCode;
 import com.example.todaymindserver.repository.UserRepository;
+import com.example.todaymindserver.repository.UserWithdrawalHistoryRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserWithdrawalHistoryRepository userWithdrawalHistoryRepository;
     private final RefreshTokenService refreshTokenService;
 
     /** 1. 닉네임 설정 (PATCH /api/nickname) */
@@ -82,6 +88,22 @@ public class UserService {
     @Transactional
     public void delete(Long userId) {
         User user = getUser(userId);
+
+        userWithdrawalHistoryRepository
+            .findByProviderAndProviderUserId(
+                user.getProvider(),
+                user.getProviderUserId()
+            )
+            .ifPresent(userWithdrawalHistoryRepository::delete);
+
+        UserWithdrawalHistory history =
+            UserWithdrawalHistory.create(
+                user.getProvider(),
+                user.getProviderUserId(),
+                LocalDateTime.now()
+            );
+
+        userWithdrawalHistoryRepository.save(history);
 
         // 연관된 코드 삭제
         refreshTokenService.deleteRefreshToken(user.getUserId());
