@@ -1,17 +1,21 @@
 package com.example.todaymindserver.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.todaymindserver.common.provider.OauthProvider;
 import com.example.todaymindserver.common.util.JwtProvider;
 import com.example.todaymindserver.common.factory.OauthProviderFactory;
+import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.oauth.OauthProviderType;
+import com.example.todaymindserver.domain.user.UserErrorCode;
 import com.example.todaymindserver.dto.request.OauthRequestDto;
 import com.example.todaymindserver.dto.response.LoginResponseDto;
 import com.example.todaymindserver.dto.response.OauthUserInfo;
 import com.example.todaymindserver.domain.user.User;
 import com.example.todaymindserver.repository.UserRepository;
+import com.example.todaymindserver.repository.UserWithdrawalHistoryRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,8 +25,12 @@ public class OauthService {
 
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
+    private final UserWithdrawalHistoryRepository userWithdrawalHistoryRepository;
     private final OauthProviderFactory providerFactory;
     private final JwtProvider jwtProvider;
+
+    @Value("${policy.rejoin-cooldown-hours}")
+    private int rejoinCooldownHours;
 
     /**
      * OAuth 로그인 혹은 회원가입을 처리하는 핵심 비즈니스 흐름.
@@ -54,6 +62,15 @@ public class OauthService {
     ) {
         OauthProvider oauthProvider = providerFactory.getProvider(oauthProviderType);
         OauthUserInfo userInfo = oauthProvider.getUserInfoFromOauthServer(request);
+
+        userWithdrawalHistoryRepository.findByProviderAndProviderUserId(
+            oauthProviderType,
+            userInfo.sub()
+        ).ifPresent(history -> {
+            if(history.isCooldownActive(rejoinCooldownHours)) {
+                throw new BusinessException(UserErrorCode.REJOIN_COOLDOWN_ACTIVE);
+            }
+        });
 
         User user = findOrCreateUserBy(oauthProviderType, userInfo.sub(), userInfo.email());
 
