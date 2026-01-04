@@ -254,6 +254,9 @@ public class DiaryService {
 
         DiaryWriteStatus diaryWriteStatus = diaryWriteStatusService.getDiaryWriteStatus(user, targetDate);
 
-        return new DiaryWriteStatusResponseDto(diaryWriteStatus.getStatus());
+        return new DiaryWriteStatusResponseDto(
+            diaryWriteStatus.getStatus(),
+            diaryWriteStatus.getDiaryId()
+        );
     }
 }
