@@ -9,9 +9,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 
 import com.example.todaymindserver.common.client.ai.dto.AiResponse;
+import com.example.todaymindserver.common.client.util.SafeBody;
 import com.example.todaymindserver.dto.Message;
 
 import lombok.RequiredArgsConstructor;
@@ -52,8 +55,21 @@ public class AiClient {
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(body)
             .retrieve()
-            .onStatus(HttpStatusCode::isError, (req, res) -> {
-                log.error("AI 응답 API 요청 중 오류가 발생하였습니다: {}", res.getStatusCode());
+            .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                log.warn(
+                    "[AI][CALL_FAIL][4xx] status={}, body={}",
+                    res.getStatusCode(),
+                    SafeBody.read(res)
+                );
+                throw new HttpClientErrorException(res.getStatusCode());
+            })
+            .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+                log.error(
+                    "[AI][CALL_FAIL][5xx] status={}, body={}",
+                    res.getStatusCode(),
+                    SafeBody.read(res)
+                );
+                throw new HttpServerErrorException(res.getStatusCode());
             })
             .body(AiResponse.class);
     }
