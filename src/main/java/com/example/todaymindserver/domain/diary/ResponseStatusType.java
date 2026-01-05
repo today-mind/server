@@ -1,4 +1,4 @@
-package com.example.todaymindserver.domain.clova;
+package com.example.todaymindserver.domain.diary;
 
 public enum ResponseStatusType {
     PENDING,

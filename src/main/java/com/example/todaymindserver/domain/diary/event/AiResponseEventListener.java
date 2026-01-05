@@ -1,4 +1,4 @@
-package com.example.todaymindserver.common.event;
+package com.example.todaymindserver.domain.diary.event;
 
 import java.util.List;
 
@@ -14,8 +14,8 @@ import org.springframework.web.client.ResourceAccessException;
 
 import com.example.todaymindserver.common.client.ai.AiClient;
 import com.example.todaymindserver.common.client.ai.prompt.PromptBuilder;
-import com.example.todaymindserver.common.client.dto.ClovaResponse;
-import com.example.todaymindserver.common.event.dto.EmpatheticResponseEvent;
+import com.example.todaymindserver.common.client.ai.dto.AiResponse;
+import com.example.todaymindserver.domain.diary.event.dto.EmpatheticResponseEvent;
 import com.example.todaymindserver.dto.Message;
 import com.example.todaymindserver.service.AiService;
 
@@ -51,7 +51,7 @@ public class AiResponseEventListener {
             event.toneType()
         );
 
-        ClovaResponse response;
+        AiResponse response;
         try {
             response = aiClient.getAiResponse(messages);
         } catch (ResourceAccessException | HttpServerErrorException e) {

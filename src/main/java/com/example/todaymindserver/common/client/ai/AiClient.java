@@ -11,13 +11,15 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import com.example.todaymindserver.common.client.dto.ClovaResponse;
+import com.example.todaymindserver.common.client.ai.dto.AiResponse;
 import com.example.todaymindserver.dto.Message;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class AiClient {
 
     private final RestClient restClient = RestClient.create();
@@ -34,7 +36,7 @@ public class AiClient {
     public static final double REPEAT_PENALTY = 1.1;
     public static final int MAX_TOKENS = 256;
 
-    public ClovaResponse getAiResponse(List<Message> messages)  {
+    public AiResponse getAiResponse(List<Message> messages)  {
 
         Map<String, Object> body = new HashMap<>();
         body.put("messages", messages);
@@ -53,6 +55,6 @@ public class AiClient {
             .onStatus(HttpStatusCode::isError, (req, res) -> {
                 log.error("AI 응답 API 요청 중 오류가 발생하였습니다: {}", res.getStatusCode());
             })
-            .body(ClovaResponse.class);
+            .body(AiResponse.class);
     }
 }

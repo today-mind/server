@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.diary.DiaryErrorCode;
-import com.example.todaymindserver.domain.diary_write_status.DiaryWriteStatus;
+import com.example.todaymindserver.domain.diary.DiaryWriteStatus;
 import com.example.todaymindserver.domain.user.User;
 import com.example.todaymindserver.repository.DiaryWriteStatusRepository;
 

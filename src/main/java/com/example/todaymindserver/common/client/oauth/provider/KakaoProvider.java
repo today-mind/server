@@ -1,9 +1,9 @@
-package com.example.todaymindserver.common.provider;
+package com.example.todaymindserver.common.client.oauth.provider;
 
 import org.springframework.stereotype.Component;
 
-import com.example.todaymindserver.common.client.kakao.KakaoOauthClient;
-import com.example.todaymindserver.common.client.dto.KakaoUserResponse;
+import com.example.todaymindserver.common.client.oauth.KakaoOauthClient;
+import com.example.todaymindserver.common.client.oauth.dto.KakaoUserResponse;
 import com.example.todaymindserver.domain.oauth.OauthProviderType;
 import com.example.todaymindserver.dto.request.OauthRequestDto;
 import com.example.todaymindserver.dto.response.OauthUserInfo;

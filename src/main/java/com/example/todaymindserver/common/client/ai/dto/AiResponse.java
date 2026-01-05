@@ -1,8 +1,8 @@
-package com.example.todaymindserver.common.client.dto;
+package com.example.todaymindserver.common.client.ai.dto;
 
 import com.example.todaymindserver.dto.Message;
 
-public record ClovaResponse(
+public record AiResponse(
     Status status,
     Result result
 )

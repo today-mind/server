@@ -1,7 +1,7 @@
 package com.example.todaymindserver.dto.response;
 
 import com.example.todaymindserver.domain.user.EmotionType;
-import com.example.todaymindserver.domain.clova.ResponseStatusType;
+import com.example.todaymindserver.domain.diary.ResponseStatusType;
 import com.example.todaymindserver.domain.diary.Diary;
 import lombok.Builder;
 import lombok.Getter;

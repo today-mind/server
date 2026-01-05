@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.todaymindserver.common.client.slack.SlackNotifierClient;
-import com.example.todaymindserver.common.policy.RefreshTokenPolicy;
+import com.example.todaymindserver.domain.token.RefreshTokenPolicy;
 import com.example.todaymindserver.common.util.JwtProvider;
 import com.example.todaymindserver.domain.user.User;
 import com.example.todaymindserver.dto.request.RefreshTokenRequestDto;

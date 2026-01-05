@@ -1,11 +1,11 @@
-package com.example.todaymindserver.common.client.kakao;
+package com.example.todaymindserver.common.client.oauth;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import com.example.todaymindserver.common.client.dto.KakaoUserResponse;
+import com.example.todaymindserver.common.client.oauth.dto.KakaoUserResponse;
 import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.oauth.OauthErrorCode;
 

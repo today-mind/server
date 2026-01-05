@@ -1,4 +1,4 @@
-package com.example.todaymindserver.common.factory;
+package com.example.todaymindserver.common.client.oauth;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.example.todaymindserver.common.provider.OauthProvider;
+import com.example.todaymindserver.common.client.oauth.provider.OauthProvider;
 import com.example.todaymindserver.domain.oauth.OauthProviderType;
 
 @Component
