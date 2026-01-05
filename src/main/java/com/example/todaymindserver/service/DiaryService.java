@@ -1,6 +1,6 @@
 package com.example.todaymindserver.service;
 
-import com.example.todaymindserver.common.event.dto.EmpatheticResponseEvent;
+import com.example.todaymindserver.domain.diary.event.dto.EmpatheticResponseEvent;
 import com.example.todaymindserver.domain.diary.DiaryWriteStatus;
 import com.example.todaymindserver.domain.user.EmotionType;
 import com.example.todaymindserver.dto.request.DiaryRequestDto;

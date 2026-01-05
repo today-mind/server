@@ -1,4 +1,4 @@
-package com.example.todaymindserver.common.client.dto;
+package com.example.todaymindserver.common.client.oauth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

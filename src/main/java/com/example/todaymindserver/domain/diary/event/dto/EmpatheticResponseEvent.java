@@ -1,4 +1,4 @@
-package com.example.todaymindserver.common.event.dto;
+package com.example.todaymindserver.domain.diary.event.dto;
 
 import com.example.todaymindserver.domain.user.EmotionType;
 import com.example.todaymindserver.domain.user.MbtiType;

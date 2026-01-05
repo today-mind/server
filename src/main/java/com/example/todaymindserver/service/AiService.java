@@ -3,7 +3,7 @@ package com.example.todaymindserver.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.todaymindserver.common.client.dto.ClovaResponse;
+import com.example.todaymindserver.common.client.ai.dto.AiResponse;
 import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.diary.Diary;
 
@@ -18,7 +18,7 @@ public class AiService {
     private final DiaryService diaryService;
 
     @Transactional
-    public void saveAiResponse(Long userId, Long diaryId, ClovaResponse response) {
+    public void saveAiResponse(Long userId, Long diaryId, AiResponse response) {
         Diary diary = diaryService.getDiary(userId, diaryId);
 
         try {

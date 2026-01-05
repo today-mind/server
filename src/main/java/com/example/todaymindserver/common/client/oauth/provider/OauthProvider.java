@@ -1,4 +1,4 @@
-package com.example.todaymindserver.common.provider;
+package com.example.todaymindserver.common.client.oauth.provider;
 
 import com.example.todaymindserver.domain.oauth.OauthProviderType;
 import com.example.todaymindserver.dto.request.OauthRequestDto;

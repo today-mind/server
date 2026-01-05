@@ -3,9 +3,9 @@ package com.example.todaymindserver.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.todaymindserver.common.provider.OauthProvider;
+import com.example.todaymindserver.common.client.oauth.provider.OauthProvider;
 import com.example.todaymindserver.common.util.JwtProvider;
-import com.example.todaymindserver.common.factory.OauthProviderFactory;
+import com.example.todaymindserver.common.client.oauth.OauthProviderFactory;
 import com.example.todaymindserver.domain.oauth.OauthProviderType;
 import com.example.todaymindserver.domain.user.UserRejoinPolicy;
 import com.example.todaymindserver.dto.request.OauthRequestDto;

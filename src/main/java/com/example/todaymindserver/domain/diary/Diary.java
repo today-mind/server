@@ -2,7 +2,6 @@ package com.example.todaymindserver.domain.diary;
 
 import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.user.EmotionType;
-import com.example.todaymindserver.domain.clova.ResponseStatusType;
 import com.example.todaymindserver.domain.BaseTime;
 import com.example.todaymindserver.domain.user.User;
 
