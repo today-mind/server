@@ -1,9 +1,9 @@
-package com.example.todaymindserver.common.provider;
+package com.example.todaymindserver.common.client.oauth.provider;
 
 import org.springframework.stereotype.Component;
 
-import com.example.todaymindserver.common.client.google.GoogleOauthClient;
-import com.example.todaymindserver.common.client.dto.GoogleUserResponse;
+import com.example.todaymindserver.common.client.oauth.GoogleOauthClient;
+import com.example.todaymindserver.common.client.oauth.dto.GoogleUserResponse;
 import com.example.todaymindserver.domain.oauth.OauthProviderType;
 import com.example.todaymindserver.dto.request.OauthRequestDto;
 import com.example.todaymindserver.dto.response.OauthUserInfo;
