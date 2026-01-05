@@ -43,47 +43,60 @@ public class AiResponseEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(EmpatheticResponseEvent event) {
 
-        List<Message> messages = promptBuilder.buildEmpatheticPrompt(
-            event.content(),
-            event.emotionType(),
-            event.nickName(),
-            event.mbtiType(),
-            event.toneType()
-        );
-
-        AiResponse response;
         try {
-            response = aiClient.getAiResponse(messages);
-        } catch (ResourceAccessException | HttpServerErrorException e) {
-            log.warn("[AI][Fail] diaryId={}, userId={}, reason={}",
-                event.diaryId(),
-                event.userId(),
-                e.getClass().getSimpleName()
+            List<Message> messages = promptBuilder.buildEmpatheticPrompt(
+                event.content(),
+                event.emotionType(),
+                event.nickName(),
+                event.mbtiType(),
+                event.toneType()
             );
-            throw e;
-        }
 
-        try {
+            AiResponse response = aiClient.getAiResponse(messages);
+
             aiService.saveAiResponse(
                 event.userId(),
                 event.diaryId(),
                 response
             );
+
+        } catch (ResourceAccessException | HttpServerErrorException e) {
+            // retry / recover가 처리
+            throw e;
+
         } catch (Exception e) {
-            log.error("[AI][Unexpected]", e);
-            aiService.markFailed(event.userId(), event.diaryId());
+            // 🔥 여기서 모든 구멍을 막는다
+            log.error(
+                "[AI][Unhandled] diaryId={}, userId={}, reason={}",
+                event.diaryId(),
+                event.userId(),
+                e.getClass().getSimpleName()
+            );
+            aiService.markFailed(
+                event.userId(),
+                event.diaryId()
+            );
         }
     }
 
     @Recover
     public void recover(ResourceAccessException e, EmpatheticResponseEvent event) {
-        log.warn("[AI][RetryFail][Network]", e);
+        log.warn("[AI][RetryFail][Network] diaryId={}, userId={}, reason={}",
+            event.diaryId(),
+            event.userId(),
+            e.getClass().getSimpleName()
+        );
         aiService.markFailed(event.userId(), event.diaryId());
     }
 
     @Recover
     public void recover(HttpServerErrorException e, EmpatheticResponseEvent event) {
-        log.warn("[AI][RetryFail][5xx]", e);
+        log.error(
+            "[AI][RetryFail][5xx] diaryId={}, userId={}, reason={}",
+            event.diaryId(),
+            event.userId(),
+            e.getClass().getSimpleName()
+        );
         aiService.markFailed(event.userId(), event.diaryId());
     }
 }
