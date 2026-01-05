@@ -17,14 +17,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class KakaoOauthClient {
 
-    private final RestClient restClient = RestClient.create();
+    private final RestClient oauthRestClient;
 
     @Value("${oauth.kakao.user-info-url}")
     private String kakaoUserInfoUrl;
 
     public KakaoUserResponse getKakaoUserInfo (String accessToken) {
 
-        KakaoUserResponse response = restClient.get()
+        KakaoUserResponse response = oauthRestClient.get()
             .uri(kakaoUserInfoUrl)
             .header("Authorization", "Bearer " + accessToken)
             .retrieve()

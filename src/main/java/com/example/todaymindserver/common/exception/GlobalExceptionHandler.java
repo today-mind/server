@@ -2,12 +2,14 @@ package com.example.todaymindserver.common.exception;
 
 import java.time.DateTimeException;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.ResourceAccessException;
 
 import com.example.todaymindserver.common.security.SecurityUtil;
 import com.example.todaymindserver.domain.BusinessException;
@@ -95,6 +97,21 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.status(e.getErrorCode().getHttpStatus().value()).body(response);
+    }
+
+    /** 외부 API 타임아웃 */
+    @ExceptionHandler(ResourceAccessException .class)
+    public ResponseEntity<ErrorResponse> handleResourceAccessException (ResourceAccessException e) {
+
+        log.warn("외부 API 타임아웃 발생: {}", e.getMessage());
+
+        ErrorResponse response = ErrorResponse.builder()
+            .status(504)
+            .code("GATEWAY_TIMEOUT")
+            .message("외부 서비스 응답이 지연되고 있습니다. 잠시 후 다시 시도해 주세요.")
+            .build();
+
+        return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body(response);
     }
 
     /** 예상 못한 모든 서버 오류 */

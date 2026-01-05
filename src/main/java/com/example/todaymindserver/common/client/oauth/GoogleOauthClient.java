@@ -17,14 +17,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class GoogleOauthClient {
 
-    private final RestClient restClient = RestClient.create();
+    private final RestClient oauthRestClient;
 
     @Value("${oauth.google.user-info-url}")
     private String googleUserInfoUrl;
 
     public GoogleUserResponse getGoogleUserInfo(String accessToken)  {
 
-        GoogleUserResponse response = restClient.get()
+        GoogleUserResponse response = oauthRestClient.get()
             .uri(googleUserInfoUrl)
             .header("Authorization", "Bearer " + accessToken)
             .retrieve()

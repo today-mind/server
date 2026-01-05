@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AiClient {
 
-    private final RestClient restClient = RestClient.create();
+    private final RestClient aiRestClient ;
 
     @Value("${clova.completion-url}")
     private String completionUrl;
@@ -46,7 +46,7 @@ public class AiClient {
         body.put("repeatPenalty", REPEAT_PENALTY);
         body.put("maxTokens", MAX_TOKENS);
 
-        return restClient.post()
+        return aiRestClient.post()
             .uri(completionUrl)
             .header("Authorization", "Bearer " + apiKey)
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
