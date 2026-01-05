@@ -3,9 +3,12 @@ package com.example.todaymindserver.common.client.oauth;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 
 import com.example.todaymindserver.common.client.oauth.dto.KakaoUserResponse;
+import com.example.todaymindserver.common.client.util.SafeBody;
 import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.oauth.OauthErrorCode;
 
@@ -17,20 +20,32 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class KakaoOauthClient {
 
-    private final RestClient restClient = RestClient.create();
+    private final RestClient oauthRestClient;
 
     @Value("${oauth.kakao.user-info-url}")
     private String kakaoUserInfoUrl;
 
     public KakaoUserResponse getKakaoUserInfo (String accessToken) {
 
-        KakaoUserResponse response = restClient.get()
+        KakaoUserResponse response = oauthRestClient.get()
             .uri(kakaoUserInfoUrl)
             .header("Authorization", "Bearer " + accessToken)
             .retrieve()
-            .onStatus(HttpStatusCode::isError, (req, res) -> {
-                log.error("Kakao 사용자 프로필 API 요청 중 오류가 발생하였습니다: {}", res.getStatusCode());
-                throw new RuntimeException("Kakao 사용자 프로필 API 조회 실패");
+            .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                log.warn(
+                    "[OAUTH][4xx] status={}, body={}",
+                    res.getStatusCode(),
+                    SafeBody.read(res)
+                );
+                throw new HttpClientErrorException(res.getStatusCode());
+            })
+            .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+                log.error(
+                    "[OAUTH][5xx] status={}, body={}",
+                    res.getStatusCode(),
+                    SafeBody.read(res)
+                );
+                throw new HttpServerErrorException(res.getStatusCode());
             })
             .body(KakaoUserResponse.class);
 
