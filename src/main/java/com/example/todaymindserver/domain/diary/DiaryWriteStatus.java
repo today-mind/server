@@ -1,4 +1,4 @@
-package com.example.todaymindserver.domain.diary_write_status;
+package com.example.todaymindserver.domain.diary;
 
 import java.time.LocalDate;
 

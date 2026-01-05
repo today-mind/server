@@ -1,4 +1,4 @@
-package com.example.todaymindserver.common.scheduler;
+package com.example.todaymindserver.domain.token.scheduler;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
