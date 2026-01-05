@@ -1,4 +1,4 @@
-package com.example.todaymindserver.common.policy;
+package com.example.todaymindserver.domain.token;
 
 import java.util.Date;
 
@@ -6,8 +6,6 @@ import org.springframework.stereotype.Component;
 
 import com.example.todaymindserver.common.util.JwtProvider;
 import com.example.todaymindserver.domain.BusinessException;
-import com.example.todaymindserver.domain.token.RefreshToken;
-import com.example.todaymindserver.domain.token.TokenErrorCode;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

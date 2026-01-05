@@ -1,21 +1,18 @@
 package com.example.todaymindserver.service;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.todaymindserver.common.provider.OauthProvider;
 import com.example.todaymindserver.common.util.JwtProvider;
 import com.example.todaymindserver.common.factory.OauthProviderFactory;
-import com.example.todaymindserver.domain.BusinessException;
 import com.example.todaymindserver.domain.oauth.OauthProviderType;
-import com.example.todaymindserver.domain.user.UserErrorCode;
+import com.example.todaymindserver.domain.user.UserRejoinPolicy;
 import com.example.todaymindserver.dto.request.OauthRequestDto;
 import com.example.todaymindserver.dto.response.LoginResponseDto;
 import com.example.todaymindserver.dto.response.OauthUserInfo;
 import com.example.todaymindserver.domain.user.User;
 import com.example.todaymindserver.repository.UserRepository;
-import com.example.todaymindserver.repository.UserWithdrawalHistoryRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,12 +22,10 @@ public class OauthService {
 
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
-    private final UserWithdrawalHistoryRepository userWithdrawalHistoryRepository;
+    private final UserRejoinPolicy userRejoinPolicy;
     private final OauthProviderFactory providerFactory;
     private final JwtProvider jwtProvider;
 
-    @Value("${policy.rejoin-cooldown-hours}")
-    private int rejoinCooldownHours;
 
     /**
      * OAuth 로그인 혹은 회원가입을 처리하는 핵심 비즈니스 흐름.
@@ -60,27 +55,21 @@ public class OauthService {
         OauthProviderType oauthProviderType,
         OauthRequestDto request
     ) {
+        // 1. oauth provider 확인 후, 알맞은 oauth로 사용자 정보 가져오기
         OauthProvider oauthProvider = providerFactory.getProvider(oauthProviderType);
         OauthUserInfo userInfo = oauthProvider.getUserInfoFromOauthServer(request);
 
-        userWithdrawalHistoryRepository.findByProviderAndProviderUserId(
-            oauthProviderType,
-            userInfo.sub()
-        ).ifPresent(history -> {
-            if(history.isCooldownActive(rejoinCooldownHours)) {
-                throw new BusinessException(
-                    UserErrorCode.REJOIN_COOLDOWN_ACTIVE,
-                    String.format("회원 탈퇴 후 %s시간이 지나야 다시 가입할 수 있습니다.", rejoinCooldownHours)
-                );
+        // 2. 회원 탈퇴 정책 확인
+        userRejoinPolicy.validateRejoinAllowed(oauthProviderType, userInfo.sub());
 
-            }
-        });
-
+        // 3. 사용자 생성
         User user = findOrCreateUserBy(oauthProviderType, userInfo.sub(), userInfo.email());
 
+        // 4. 토큰 발행
         String accessToken = jwtProvider.createAccessToken(user.getUserId());
         String refreshToken = jwtProvider.createRefreshToken(user.getUserId());
 
+        // 5. DB에 세션(refresh token) 저장
         refreshTokenService.issueInitialToken(user, refreshToken);
 
         return new LoginResponseDto(
