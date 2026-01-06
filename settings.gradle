@@ -1,1 +1,11 @@
+pluginManagement {
+    repositories {
+        maven {
+            url = uri("https://maven-central.storage-download.googleapis.com/maven2/")
+        }
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
 rootProject.name = 'today-mind-server'
