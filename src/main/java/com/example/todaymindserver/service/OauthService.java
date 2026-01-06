@@ -26,30 +26,6 @@ public class OauthService {
     private final OauthProviderFactory providerFactory;
     private final JwtProvider jwtProvider;
 
-
-    /**
-     * OAuth 로그인 혹은 회원가입을 처리하는 핵심 비즈니스 흐름.
-     *
-     * <p>
-     * Flow:
-     * <ol>
-     *   <li>요청된 Provider 타입에 맞는 Provider 구현체 선택 (Provider 패턴)</li>
-     *   <li>OAuth 서버로부터 사용자 정보 조회</li>
-     *   <li>provider + sub 조합으로 기존 사용자 조회 또는 신규 사용자 생성</li>
-     *   <li>AccessToken 및 RefreshToken 발급</li>
-     *   <li>RefreshToken Rotation 정책에 따라 RefreshToken 저장/갱신</li>
-     * </ol>
-     * </p>
-     *
-     * <p>
-     * 설계 의도:
-     * <ul>
-     *   <li>Provider마다 응답 구조가 다르기 때문에 ProviderFactory를 통해 파싱 로직을 캡슐화</li>
-     *   <li>sub는 OAuth Provider 내에서 유일한 식별자이므로, provider + sub 조합을 계정 매핑 기준으로 사용</li>
-     *   <li>RefreshToken은 매 로그인마다 Rotation하여 보안성과 통제력을 확보</li>
-     * </ul>
-     * </p>
-     */
     @Transactional
     public LoginResponseDto signUpOrLoginFromOauth(
         OauthProviderType oauthProviderType,

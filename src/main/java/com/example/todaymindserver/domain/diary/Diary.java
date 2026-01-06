@@ -19,7 +19,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener; // En
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "diaries")
+@Table(name = "diary")
 public class Diary extends BaseTime { // <--- BaseTimeEntity 상속 추가
 
     /**
