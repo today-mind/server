@@ -28,7 +28,7 @@ public class UserRejoinPolicy {
                     throw new BusinessException(
                         UserErrorCode.REJOIN_COOLDOWN_ACTIVE,
                         String.format(
-                            "회원 탈퇴 후 %s시간 이내에 재가입이 불가합니다.",
+                            "회원 탈퇴 후 %s시간 이내에 재가입이 불가능합니다.",
                             rejoinCooldownHours
                         )
                     );
