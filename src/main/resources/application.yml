@@ -39,7 +39,7 @@ clova:
   api-key: ${CLOVA_API_KEY}
 
 policy:
-  rejoin-cooldown-hours: 0
+  rejoin-cooldown-hours: 24
 
 slack:
   webhook:
