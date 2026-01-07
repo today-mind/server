@@ -35,22 +35,25 @@ public class RefreshTokenService {
     private final JwtProvider jwtProvider;
 
     @Transactional
-    public void issueInitialToken(User user, String refreshToken) {
+    public void issueInitialToken(User user, String newRefreshToken) {
 
-        if (refreshTokenRepository.existsById(user.getUserId())) {
-            return; // 이미 존재하면 생성 안 함
-        }
+        RefreshToken refreshToken = refreshTokenRepository.findById(user.getUserId())
+            .map(existing -> {
+                existing.updateToken(newRefreshToken);
+                return existing;
+            })
+            .orElseGet(() -> {
+                Claims claims = jwtProvider.parseClaims(newRefreshToken);
+                LocalDateTime expiresAt = jwtProvider.extractExpiration(claims);
 
-        Claims claims = jwtProvider.parseClaims(refreshToken);
-        LocalDateTime expiresAt = jwtProvider.extractExpiration(claims);
+                return RefreshToken.create(
+                    user.getUserId(),
+                    newRefreshToken,
+                    expiresAt
+                );
+            });
 
-        RefreshToken token = RefreshToken.create(
-            user.getUserId(),
-            refreshToken,
-            expiresAt
-        );
-
-        refreshTokenRepository.save(token);
+        refreshTokenRepository.save(refreshToken);
     }
 
     @Transactional(readOnly = true)
