@@ -15,7 +15,7 @@ import org.springframework.web.client.ResourceAccessException;
 import com.example.todaymindserver.common.client.ai.AiClient;
 import com.example.todaymindserver.common.client.ai.prompt.PromptBuilder;
 import com.example.todaymindserver.common.client.ai.dto.AiResponse;
-import com.example.todaymindserver.domain.diary.event.dto.EmpatheticResponseEvent;
+import com.example.todaymindserver.domain.diary.event.dto.DiaryAiResponseRequestedEvent;
 import com.example.todaymindserver.dto.Message;
 import com.example.todaymindserver.service.AiService;
 
@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AiResponseEventListener {
+public class DiaryAiResponseEventListener {
 
     private final AiService aiService;
     private final AiClient aiClient;
@@ -41,7 +41,7 @@ public class AiResponseEventListener {
         backoff = @Backoff(delay = 1000)
     )
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handle(EmpatheticResponseEvent event) {
+    public void handle(DiaryAiResponseRequestedEvent event) {
 
         try {
             List<Message> messages = promptBuilder.buildEmpatheticPrompt(
@@ -80,7 +80,7 @@ public class AiResponseEventListener {
     }
 
     @Recover
-    public void recover(ResourceAccessException e, EmpatheticResponseEvent event) {
+    public void recover(ResourceAccessException e, DiaryAiResponseRequestedEvent event) {
         log.warn("[AI][RetryFail][Network] diaryId={}, userId={}, reason={}",
             event.diaryId(),
             event.userId(),
@@ -90,7 +90,7 @@ public class AiResponseEventListener {
     }
 
     @Recover
-    public void recover(HttpServerErrorException e, EmpatheticResponseEvent event) {
+    public void recover(HttpServerErrorException e, DiaryAiResponseRequestedEvent event) {
         log.error(
             "[AI][RetryFail][5xx] diaryId={}, userId={}, reason={}",
             event.diaryId(),

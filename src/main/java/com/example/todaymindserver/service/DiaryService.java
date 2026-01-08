@@ -1,6 +1,6 @@
 package com.example.todaymindserver.service;
 
-import com.example.todaymindserver.domain.diary.event.dto.EmpatheticResponseEvent;
+import com.example.todaymindserver.domain.diary.event.dto.DiaryAiResponseRequestedEvent;
 import com.example.todaymindserver.domain.diary.DiaryWriteStatus;
 import com.example.todaymindserver.domain.user.EmotionType;
 import com.example.todaymindserver.dto.request.DiaryRequestDto;
@@ -77,7 +77,7 @@ public class DiaryService {
 
         // 6. Ai 응답 이벤트 발행
         applicationEventPublisher.publishEvent(
-            new EmpatheticResponseEvent(
+            new DiaryAiResponseRequestedEvent(
                 diary.getDiaryId(),
                 diary.getContent(),
                 diary.getEmotionType(),
@@ -210,7 +210,7 @@ public class DiaryService {
 
         // 3. Ai 응답 이벤트 발행
         applicationEventPublisher.publishEvent(
-            new EmpatheticResponseEvent(
+            new DiaryAiResponseRequestedEvent(
                 diary.getDiaryId(),
                 diary.getContent(),
                 diary.getEmotionType(),
