@@ -50,7 +50,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers(
+                            "/actuator/health",
+                            "/actuator/prometheus"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/oauth/**",
                                 "/auth/token/refresh"
