@@ -21,14 +21,14 @@ import java.time.YearMonth;
  * <p>why: REST API 컨벤션에 따라 URI는 복수형 명사(/diaries)를 사용합니다.</p>
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/diaries")
 @RequiredArgsConstructor
 public class DiaryController {
 
     private final DiaryService diaryService;
 
     // 1. 일기 작성 API (기존 1번 기능)
-    @PostMapping("/diaries")
+    @PostMapping
     public ApiResponse<DiaryResponseDto> createDiary(
             @AuthenticationPrincipal Long userId,
             @RequestBody @Valid DiaryRequestDto request
@@ -39,7 +39,7 @@ public class DiaryController {
     }
 
     // 2. 일기 삭제 API
-    @DeleteMapping("/diaries/{diaryId}")
+    @DeleteMapping("/{diaryId}")
     public ApiResponse<Void> deleteDiary(
         @AuthenticationPrincipal Long userId,
         @PathVariable Long diaryId
@@ -57,7 +57,7 @@ public class DiaryController {
      * @param yearMonth 조회할 연도와 월 (예: 2025-10)
      * @return 해당 월에 작성된 일기 목록 DTO
      */
-    @GetMapping("/diaries/calendar")
+    @GetMapping("/calendar")
     public ApiResponse<DiaryCalendarResponseDto> getCalendarDiaries(
             @AuthenticationPrincipal Long userId,
             @RequestParam("yearMonth") YearMonth yearMonth) { // Spring 3.x에서 YearMonth 타입 바인딩 지원
@@ -74,7 +74,7 @@ public class DiaryController {
      * @param diaryId 조회할 일기 ID
      * @return 일기 상세 정보 DTO
      */
-    @GetMapping("/diaries/{diaryId}")
+    @GetMapping("/{diaryId}")
     public ApiResponse<DiaryDetailResponseDto> getDiaryDetail(
             @AuthenticationPrincipal Long userId,
             @PathVariable("diaryId") Long diaryId) {
@@ -87,7 +87,7 @@ public class DiaryController {
      * 감정 통계 리포트 조회
      * GET /api/diaries/report?year=2025&month=12
      */
-    @GetMapping("/diaries/report")
+    @GetMapping("/report")
     public ApiResponse<EmotionReportResponseDto> getEmotionReport(
             @AuthenticationPrincipal Long userId,
             @RequestParam int year,
@@ -98,7 +98,7 @@ public class DiaryController {
         return ApiResponse.success("감정 리포트 조회 완료", report);
     }
 
-    @PostMapping("/diaries/{diaryId}/ai-response")
+    @PostMapping("/{diaryId}/ai-response")
     public ApiResponse<Void> getAiResponse(
         @AuthenticationPrincipal Long userId,
         @PathVariable("diaryId") Long diaryId
@@ -108,7 +108,7 @@ public class DiaryController {
         return ApiResponse.success("AI 응답 요청 접수 완료", null, HttpStatus.ACCEPTED);
     }
 
-    @GetMapping("/diaries/today/status")
+    @GetMapping("/today/status")
     public ApiResponse<DiaryWriteStatusResponseDto> getTodayStatus(
         @AuthenticationPrincipal Long userId,
         @RequestParam int year,
