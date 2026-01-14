@@ -4,7 +4,7 @@ import com.example.todaymindserver.domain.user.EmotionType;
 import com.example.todaymindserver.domain.user.MbtiType;
 import com.example.todaymindserver.domain.user.ToneType;
 
-public record EmpatheticResponseEvent(
+public record DiaryAiResponseRequestedEvent(
     Long diaryId,
     String content,
     EmotionType emotionType,
