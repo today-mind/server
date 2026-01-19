@@ -3,10 +3,12 @@ package com.example.todaymindserver.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.todaymindserver.common.client.ai.dto.AiResponse;
 import com.example.todaymindserver.domain.BusinessException;
+import com.example.todaymindserver.domain.ai.post_processor.PostProcessor;
+import com.example.todaymindserver.domain.ai.post_processor.PostProcessorFactory;
 import com.example.todaymindserver.domain.diary.Diary;
 import com.example.todaymindserver.domain.diary.event.DiaryAiResponseMetricsEventPublisher;
+import com.example.todaymindserver.domain.user.MbtiType;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,14 +20,16 @@ public class AiService {
 
     private final DiaryService diaryService;
     private final DiaryAiResponseMetricsEventPublisher diaryAiResponseMetricsEventPublisher;
+    private final PostProcessorFactory postProcessorFactory;
 
     @Transactional
-    public void saveAiResponse(Long userId, Long diaryId, AiResponse response) {
+    public void saveAiResponse(Long userId, Long diaryId, MbtiType mbtiType, String beforePostProcessorResponse, double sentimentScore) {
         Diary diary = diaryService.getDiary(userId, diaryId);
 
         try {
-            String aiResponse = response.result().message().content();
-            diary.markResponseCompleted(aiResponse);
+            PostProcessor postProcessor = postProcessorFactory.getMBTIType(mbtiType);
+            String response = postProcessor.process(beforePostProcessorResponse, sentimentScore);
+            diary.markResponseCompleted(response);
 
             // 매트릭 수집
             diaryAiResponseMetricsEventPublisher.publishCompleted();
