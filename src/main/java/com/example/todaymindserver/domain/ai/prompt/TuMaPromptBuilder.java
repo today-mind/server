@@ -61,7 +61,7 @@ public class TuMaPromptBuilder implements PromptBuilder{
                         - 줄 바꿈, 새 줄, 또는 탈출 문자를 포함하지 마세요.
                         {
                           "response": string,
-                          "sentiment_score": number,
+                          "sentiment_score": number
                         }
                     """,
                     tonetype.getKorean()

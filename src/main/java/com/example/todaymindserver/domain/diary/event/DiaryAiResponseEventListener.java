@@ -40,8 +40,7 @@ public class DiaryAiResponseEventListener {
     @Retryable(
         retryFor = {
             ResourceAccessException.class, // timeout, network
-            HttpServerErrorException.class, // 5xx
-            JsonProcessingException.class
+            HttpServerErrorException.class // 5xx
         },
         maxAttempts = 2,
         backoff = @Backoff(delay = 1000)
