@@ -19,7 +19,6 @@ import com.example.todaymindserver.domain.ai.prompt.PromptBuilderFactory;
 import com.example.todaymindserver.domain.diary.event.dto.DiaryAiResponseRequestedEvent;
 import com.example.todaymindserver.dto.Message;
 import com.example.todaymindserver.service.AiService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
