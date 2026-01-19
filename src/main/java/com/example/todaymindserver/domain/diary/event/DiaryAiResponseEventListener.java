@@ -13,11 +13,15 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
 import com.example.todaymindserver.common.client.ai.AiClient;
-import com.example.todaymindserver.common.client.ai.prompt.PromptBuilder;
+import com.example.todaymindserver.domain.ai.prompt.PromptBuilder;
 import com.example.todaymindserver.common.client.ai.dto.AiResponse;
+import com.example.todaymindserver.domain.ai.prompt.PromptBuilderFactory;
 import com.example.todaymindserver.domain.diary.event.dto.DiaryAiResponseRequestedEvent;
 import com.example.todaymindserver.dto.Message;
 import com.example.todaymindserver.service.AiService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,13 +33,15 @@ public class DiaryAiResponseEventListener {
 
     private final AiService aiService;
     private final AiClient aiClient;
-    private final PromptBuilder promptBuilder;
+    private final PromptBuilderFactory promptBuilderFactory;
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @Async
     @Retryable(
         retryFor = {
             ResourceAccessException.class, // timeout, network
-            HttpServerErrorException.class // 5xx
+            HttpServerErrorException.class, // 5xx
+            JsonProcessingException.class
         },
         maxAttempts = 2,
         backoff = @Backoff(delay = 1000)
@@ -44,20 +50,28 @@ public class DiaryAiResponseEventListener {
     public void handle(DiaryAiResponseRequestedEvent event) {
 
         try {
-            List<Message> messages = promptBuilder.buildEmpatheticPrompt(
+            PromptBuilder promptBuilder = promptBuilderFactory.getMBTIType(event.mbtiType());
+            List<Message> messages = promptBuilder.buildEmpatheticResponsePrompt(
                 event.content(),
                 event.emotionType(),
-                event.nickName(),
-                event.mbtiType(),
                 event.toneType()
             );
 
-            AiResponse response = aiClient.getAiResponse(messages);
+            // 외부 ai api 호출
+            AiResponse aiResponse = aiClient.getAiResponse(messages);
+            String jsonFormatResponse = aiResponse.result().message().content();
+
+            // Json으로 파싱
+            JsonNode jsonNode = objectMapper.readTree(jsonFormatResponse);
+            String response = jsonNode.get("response").asText();
+            double sentimentScore = jsonNode.get("sentiment_score").asDouble();
 
             aiService.saveAiResponse(
                 event.userId(),
                 event.diaryId(),
-                response
+                event.mbtiType(),
+                response,
+                sentimentScore
             );
 
         } catch (ResourceAccessException | HttpServerErrorException e) {
